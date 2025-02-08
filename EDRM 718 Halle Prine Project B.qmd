@@ -1,0 +1,156 @@
+---
+title: "EDRM 718 Halle Prine Project B"
+author: "Halle Prine"
+format: html
+editor: visual
+---
+
+```{r include=FALSE}
+
+# The "here" library will let me read the data from an individual folder.
+library(here)
+
+# I read the data and put it in an object called "students".
+students <- read.csv(here("data", "hsb2.csv"), header = TRUE, sep = ",")
+
+# SES and race are categorical variables, what we call "factors," so I need to set them as factors.
+students$ses <- factor(students$ses, 
+                       levels = c(1, 2, 3), labels = c("Low", "Middle","High"))
+
+students$race <- factor(students$race, levels = c(1, 2, 3, 4), 
+                        labels = c("Hispanic", "Asian", "African-American","White"))
+```
+
+## Description
+
+The purpose of this report is to examine the relationship between high school seniors' socioeconomic status (SES) and reading test scores. The data derived from a study that collected a randomly selected national sample of 200 high school seniors. We will first, investigate the composition of SES within the sample. Then I will address the main purpose of this study which is to compare reading scores among different SES groups. The secondary purpose of this report is to examine the relationship between SES and ethnicity. Specifically, evaluating wheather ethincity is a potential underlying factor that influences difference in reading scores among different ethnic groups, which is suported by past literature.
+
+Source of data: The "High School and Beyond" survey conducted on high school seniors by the National Center of Education Statistics. Year unknown.
+
+## Analysis
+
+In this data set, SES is categorized as low, medium, and high. I do not know the definitions the original researchers used for these classifications. Figure 1 illustrates the composition of SES in the sample.
+
+*Figure 1. Bar plots with proportion of sample of 200 high school seniors in SES classifications.*
+
+```{r echo=FALSE}
+
+# The frequencies of students in SES categories were calculated. 
+
+ses.frq <- table(students$ses)
+
+#Then the proportions of the students in SES categories were calculated. 
+
+ses.prop <- prop.table(ses.frq)
+
+# A bar graph was then created based on the proportions
+
+barplot(ses.prop,
+        xlab = "SES Groups",
+        ylab = "Proportion", ylim = c(0, 0.5))
+
+```
+
+```{r include=FALSE}
+# Since there were a small amount of frequencies and proportions I decided to put it into a table and incorporating it into a written narrative instead of a table.
+
+cbind(ses.frq, ses.prop)
+```
+
+Our sample consists of 23.5% of students in the low, 47% in the middle, and 29.0% in the high SES categories.
+
+Figure 2 illustrates the relationship between student's reading test scores and their SES categories. We see that the central tendency of the reading scores in the high SES category tends to perform better than that of the other SES categories (i.e., medium SES category), which in turn outperforms the low SES category. Additionally, the variations between these categories are similar to one another.
+
+*Figure 2. Side-by-Side boxplots illustrating reading test scores for SES categories.*
+
+```{r echo=FALSE}
+# This command creates side-by-side boxplots.
+
+boxplot(students$read ~ students$ses,
+        ylim = c(20, 80),
+        xlab = "SES Level",
+        ylab = "Reading Score")
+```
+
+In Table 1 we have our sample's descriptive statistics for the reading scores from every SES category (low, middle, and high). For each measure of location (i.e., every statistic within the table *except* the standard deviation (SD)), the change to a higher SES is associated with a change in reading test scores across the range of the data. As an example, the mean for the middle SES students is approximately 3 points higher than the low SES students. Similarly, the mean for the students within the high SES group is about 5 points higher than for the middle SES group.
+
+*Table 1. Statistics for the three SES categories*
+
+```{r echo=FALSE}
+# Below I calculated each descriptive statistic for the reading scores of SES groups.
+
+Mean <- tapply(students$read, students$ses, mean)
+SD <- tapply(students$read, students$ses, sd)
+Min <- tapply(students$read, students$ses, min)
+Q1 <- tapply(students$read, students$ses, quantile, p = 0.25)
+Med <-  tapply(students$read, students$ses, median)
+Q3 <- tapply(students$read, students$ses, quantile, p = 0.75)
+Max <- tapply(students$read, students$ses, max)
+
+# Then I created a "column bind" for the table. 
+
+# The "round" function rounds each number to the whole number, eliminating the decimal points.
+
+round(cbind(Mean, SD, Min, Q1, Med, Q3, Max))
+```
+
+From our sample we had four ethnic categories: Hispanic, Asian, African American, and white. Figure 3 helps illustrate the relationship between SES categories and ethnicity.
+
+```{r echo=FALSE}
+# Below I calculated each descriptive statistic for the reading scores of SES groups.
+
+Mean <- tapply(students$read, students$ses, mean)
+SD <- tapply(students$read, students$ses, sd)
+Min <- tapply(students$read, students$ses, min)
+Q1 <- tapply(students$read, students$ses, quantile, p = 0.25)
+Med <-  tapply(students$read, students$ses, median)
+Q3 <- tapply(students$read, students$ses, quantile, p = 0.75)
+Max <- tapply(students$read, students$ses, max)
+
+# Then I created a "column bind" for the table. 
+
+# The "round" function rounds each number to the whole number, eliminating the decimal points.
+
+round(cbind(Mean, SD, Min, Q1, Med, Q3, Max))
+```
+
+*Figure 3. Bar Plots with percent of each SES category within ethnic groups.*
+
+```{r echo=FALSE}
+# This code below constructs a two-way table of frequencies.
+
+ses.race.counts = table(students$ses, students$race)
+
+# This constructs conditional percentages (conditioned on ethnic group) of
+# SES categories.
+
+ses.race.percents = 100*prop.table(ses.race.counts, 2)
+
+# This provides a stacked bar graph.
+
+barplot(ses.race.percents,
+        xlab = "Ethnic Group",
+        ylab = "Percents",
+        legend = c("Low", "Middle", "High"),
+        args.legend = list(title = "SES", cex = .7))
+```
+
+Finally, Table 2 provides the percentages of each SES category within each ethnicity. The table illustrates a clear relationship between SES and ethnic groups. A relatively low percentage of whites are in low SES category, while percentages of non-white ethnic groups are substantially higher in low SES categories than for whites; specifically, it is three times higher for African Americans.
+
+```{r echo=FALSE}
+# This code provides percentages. The "round" function is used again to eliminate decimal points.
+
+round(ses.race.percents)
+```
+
+## Conclusions
+
+The purpose of this report was to examine whether reading test scores are related to socioeconomic status. Our primary analyses indicate that there is a relationship between the two. In students we see that as socioeconomic status increases, the reading test score also increase. This remains true across the range of the reading test scores. Specifically, the mean for students in the middle SES group is about 3 points higher compared to low SES students. Similarly, the mean for those in the high SES group is about 5 points higher than for those in the middle SES group. This upward shit has very little influence on the width of the distributions of the scores, thus it is an "across the board" shift.
+
+Our secondary purpose of this report was to examine the relationship between SES and ethnicity, again our analyses revealed a possible relationship. A substantially higher percentage of white students came from a higher SES category than those of Hispanic, Asian, and especially, African American student counterparts. For instance, the percentage of African American high school seniors from low SES homes were three times the percentage of white seniors from low SES homes. This relationship reestablishes the rational as to why there are differences in reading scores across different ethnic groups. Future studies should try to focus more on this relationship and confirm this possible finding.
+
+## Press Release
+
+Researchers from the University of South Carolina used a national sample of 200 high school seniors to study the relationship between socioeconomic status to reading scores. "These findings are important," stated lead analyst Mike Seaman, "because SES widely varies and could be related to school resources and instructional environment." Seaman said that about half of the seniors are from middle-income homes, with the other half about evenly split between high- and low-income homes. "That's not a complete picture," he said, "because the distribution is very different for different ethnic groups. For example, the percentage of African American seniors in low-income homes is over three times the percentage of whites in low-income homes."
+
+The main findings of the study show that there is indeed a relationship of SES to reading test scores, with test scores increasing as income-level increases. Seaman reports the difference in average reading test scores for seniors from a high SES environment is about 8 points higher than that of seniors from a low SES home.
