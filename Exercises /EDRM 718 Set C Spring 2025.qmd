@@ -1,0 +1,132 @@
+---
+Author: "Halle Prine" 
+title: "EDRM 718 Exercise Set C"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+------------------------------------------------------------------------
+
+**1. Create a vector called Vector_A that contains 100 randomly selected values from a normal distribution that has a mean of 50 and a standard deviation of 10.**
+```{r}
+# Set seed for reproducibility
+set.seed(123)
+
+# Create Vector_A
+Vector_A <- rnorm(100, mean = 50, sd = 10)
+
+# Display the first few values of Vector_A
+head(Vector_A)
+```
+
+------------------------------------------------------------------------
+
+**2. Create Vector_B by selecting the first, third, and eighth elements of Vector_A.**
+```{r}
+# Create Vector_B by selecting specific elements from Vector_A
+Vector_B <- Vector_A[c(1, 3, 8)]
+
+# Display Vector_B
+Vector_B
+```
+------------------------------------------------------------------------
+
+**3. Create Vector_C by selecting all the elements of Vector_A except for the 10th and 15th elements.**
+
+------------------------------------------------------------------------
+
+**4. Create Vector_D by selecting all the elements of Vector_A that are less than 40.**
+
+------------------------------------------------------------------------
+
+**5. Find the length of Vector_D.**
+
+------------------------------------------------------------------------
+
+**6. Count how many elements of Vector_A are positive.**
+
+------------------------------------------------------------------------
+
+**7. Find the minimum and maximum values in Vector_A.**
+
+------------------------------------------------------------------------
+
+**8. Create Vector_E so that it has the same values as Vector_A, but in numerical order.**
+
+------------------------------------------------------------------------
+
+**9. Create Vector_F so that it contains even numbers from 2 to 100.**
+
+------------------------------------------------------------------------
+
+**10. Create Vector_G so that it is Vector_F in reverse order.**
+
+------------------------------------------------------------------------
+
+**11. Create Vector_H by adding Vector_F to Vector_G.**
+
+------------------------------------------------------------------------
+
+**12. Create Vector_I as a character vector containing the numerals corresponding to Vector_F.**
+
+------------------------------------------------------------------------
+
+**13. Create Vector_J by randomizing the order of the numerals in Vector_I. (Hint: the *sample()* function might be useful.)**
+
+------------------------------------------------------------------------
+
+**14. Create Vector_K from Vector_J by selecting the numerals up through "20".**
+
+------------------------------------------------------------------------
+
+**15. Create Vector_L by putting Vector_K in order.**
+
+------------------------------------------------------------------------
+
+**16. Create the three matrices shown below. Name these matrices *A*, *B*, and *C*, respectively.**
+
+$$
+\left[\begin{array}
+{rrr}
+4 & 2 \\
+2 & 3 \\
+6 & 6
+\end{array}\right]
+\left[\begin{array}
+{rrr}
+7 & 3 \\
+2 & 5 \\
+\end{array}\right]
+\left[\begin{array}
+{rrr}
+8   & 5 & 1 \\
+1 & 3 & 4 \\
+1 & 7 & 2 \end{array}\right]
+$$
+
+------------------------------------------------------------------------
+
+**17. Extract the value in the first row and second column of *A* and store it in *my_value*.**
+
+------------------------------------------------------------------------
+
+**18. Extract the bottom two rows of *A* to create a new matrix, *D*.**
+
+------------------------------------------------------------------------
+
+**19. Name the columns of *A* with *Var_1* and *Var_2*.**
+
+------------------------------------------------------------------------
+
+**20. Name the rows of *A* with *Bob*, *Mary*, and *Shameka*.**
+
+------------------------------------------------------------------------
+
+**21. Transpose matrix *C* and store the result in a new matrix, *E*.**
+
+------------------------------------------------------------------------
+
+**22. Change matrix *E* by adding 15 to every element.**
+
+------------------------------------------------------------------------

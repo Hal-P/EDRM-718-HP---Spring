@@ -1,0 +1,58 @@
+---
+title: "Hello World and More"
+author: "Halle Prine"
+output: html_document
+
+---
+
+*Complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Four points per item)*
+
+# Hello World
+
+```{r include=FALSE}
+# The following code meets the traditional first requirement
+# when learning a new computer language
+My_Variable <- "Hello World!"
+print(My_Variable)
+rm(list = ls())
+```
+
+***
+
+**1. Create a YAML for this notebook that minimally includes the notebook title (Hello World and More) as well as your name as the notebook author.**
+
+***
+
+## Statistics Fromula
+
+**2. Create a code chunk that contains a “hello world” script. Introduce the chunk with a line or two that explains that this code chunk is to meet the traditional first requirement when learning anew computer language.**
+My_Variable <- "Hello World!"
+print(My_Variable)
+rm(list = ls())
+
+***
+
+**3. Select a formula for a statistic of your choosing. Introduce the formula and then write it in your notebook. Also define any terms in the formula.**
+
+# Here is the statistical formula for calculating the mean 
+
+$$ \bar{x} = \frac{\sum_{i=1}^{n} x_i}{n} $$
+
+# Example R code to compute the mean
+data <- c(5, 10, 15, 20)
+
+mean(data)
+
+***
+
+### Course Motivation
+
+**4. In one paragraph, state why you are taking this course and your primary hope for what you will know and be able to do when you finish this course.**
+
+# I decided to take this course to enhance my skills in RStudio and improve my data visualization techniques. As I progress in my dissertation and research, I am particularly interested in modeling fNIRS data and presenting it through attractive and easily digestible graphs, such as Region of Interest (ROI) analyses. Additionally, I have always wanted to strengthen my proficiency in programming languages, recognizing that this skill will make me more competitive in the field of exercise science. Lastly, I aim to improve my ability to efficiently merge datasets with minimal data loss.  
+
+***
+
+**5. Create headings for each of the three major sections (hello world, statistics formula, and course motivation) in this notebook.**
+
+***

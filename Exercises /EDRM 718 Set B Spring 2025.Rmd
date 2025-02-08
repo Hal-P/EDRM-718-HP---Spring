@@ -1,0 +1,386 @@
+---
+title: "EDRM 718 Exercise Set B"
+author: "Halle Prine"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)* \*\*\*
+
+**1. Write a line of code that will create a vector named *distance* that contains the distance (to the nearest mile) of you and your fellow students.**
+
+Here I created a vector called distance that contains the student's mileage to class.
+
+```{r}
+distance <- c(2,19,5,1,2,2,7)
+distance
+```
+
+------------------------------------------------------------------------
+
+**2. What is the class of the distance vector? Use R code to support your answer.**
+
+Using the "class" function in r-studio I am able to see that the vector is classified as "numeric"
+
+```{r}
+class(distance)
+```
+
+------------------------------------------------------------------------
+
+**3. Write a line of code that names each element of distance with the name of the person who travels that distance.**
+
+Similar to the distance variable I again created a vector with string variables of the \# student's names.
+Once that is created I attache the name vector with the distance and see that they are correctly attached.
+
+```{r}
+names <- c("Nestor", "Jongwon", "Kaitlyn", "Supraja", "Benny", "Regin", "Halle")
+names(distance) <- names
+distance
+```
+
+------------------------------------------------------------------------
+
+**4. Write a line of code to coerce the distance vector to a logical class. Store the result in logical_distance.**
+
+```{r}
+logical_distance <- as.logical(distance)
+```
+
+------------------------------------------------------------------------
+
+**5. Show what is contained in logical_distance and explain why these are the elements of the vector.**
+
+```{r}
+logical_distance
+```
+
+The result from the 'as.logical()' function is as follows below:
+
+[1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+
+The 'as.logical()' function will convert number values to logical values where 0 will be FALSE and and any non-zero value will be TRUE.
+Examining the vector above we see that it consisted of 2, 19, 5, 1, 2, 2, 7 all of which are non-zero values.
+Therefore, all elements were converted to "TRUE".
+
+**6. If you want to store not only the names and distances of class members, but also their email addresses, what would be the best object for storing these data? Write code to accomplish this task.**
+
+The best way to store this data would be to create a data frame of all these elements.
+We want to use data frames instead of a list because data frames are better at storing data that are the same length.
+If the data were at different lengths then storing it as a list would have been better.
+
+```{r}
+emails <- c("NFU@email.sc.edu","lee1125@sc.edu","ktramey@email.sc.edu","srikumar@email.sc.edu","thomswab@email.sc.edu","regin@email.sc.edu","hprine@email.sc.edu")
+
+class_data <- data.frame(
+Name = names, 
+Distance = distance, 
+Emails = emails,
+stringAsFactors = FALSE 
+)
+
+class_data
+```
+
+------------------------------------------------------------------------
+
+**7. Provide the object name, class, attributes, and dimensions for the object you created to store class member data. Use R code to support your answer.**
+
+```{r include=FALSE}
+object_name <- "class_data"
+class(class_data)
+attributes(class_data)
+dim(class_data)
+```
+
+------------------------------------------------------------------------
+
+**8. Shown below is a correlation matrix. Write code to create a matrix object that contains this correlation matrix.**
+
+$$
+\left[\begin{array}
+{rrr}
+1.0 & 0.378 & -0.093 \\
+0.378 & 1.0 & 0.588 \\
+-0.093 & 0.588 & 1.0
+\end{array}\right]
+$$
+
+To create a matrix object containing the correlation matrix, we first need to assign the matrix to a recognizable object \# using the "matrix' function. In the code below, corr_matrix is the object designated to store the correlation matrix.
+
+```{r}
+# First, we can store these correlation values in the object 'correlation_values'
+correlation_values <- c(
+  1.0,  0.378, -0.093,
+  0.378,  1.0,  0.588,
+ -0.093,  0.588,  1.0
+)
+
+# Next, we can create a matrix and assign it to the object 'corr_matrix' to store the correlation matrix
+corr_matrix <- matrix(
+  data = correlation_values,  # Values of the matrix
+  nrow = 3,                   # Number of rows
+  ncol = 3,                   # Number of columns
+  byrow = TRUE                # Fill the matrix row by row
+)
+
+# Print the correlation 
+corr_matrix
+```
+
+------------------------------------------------------------------------
+
+**9. The three variables being correlated are (in order): IQ, brain size, and height. Add code to add these names to both the rows and columns of your matrix.**
+
+Now, to name the the three variables within the correlation matrix we need to use functions like 'rownames' and 'colnames' to add the names to the rows and columns.
+Below is provided code that shows how to do this.
+
+```{r}
+# First, we can store the variable names 'IQ', 'Brain Size', and 'Height' into a object. 
+
+variable_names <- c("IQ", "Brain Size", "Height")
+
+# Then we can add the names to the rows and columns using 'rownames' and 'colnames' 
+
+rownames(corr_matrix) <- variable_names
+
+colnames(corr_matrix) <- variable_names
+
+
+# Print the correlation 
+corr_matrix
+```
+
+------------------------------------------------------------------------
+
+**10. Select a restaurant of your choice. Write code to create a list with the following named elements.**
+
+```         
+Name: Name of the restaurant
+City: Town or city where the restaurant is located
+Sat_Hours: The opening and closing times on Saturdays
+Food_Type: Main type of cuisine
+Alcohol: A logical indicator of whether or not alcohol is served
+Entrée_Range: The range of prices (low to high) of entrees
+```
+
+To create a list we will use the 'list()' function, assigning each element (i.e., Name, City, Sat_Hours, etc.,) to their respective values.
+we will store the list in the object 'restaurant_info'.
+
+```{r}
+# Create a list with named elements
+restaurant_info <- list(
+  Name = "Cantina 76",
+  City = "Devine Street, Columbia, SC 29209",
+  Sat_Hours = "11 AM - 10 PM",
+  Food_Type = "Mexican-Inspired casual restaurant",
+  Alcohol = TRUE,  
+  Entree_Range = "$2.99 to $8.99"
+)
+
+# Print the list
+restaurant_info
+
+```
+
+------------------------------------------------------------------------
+
+**11. Add a comment to your object that is a brief review of the restaurant.**
+
+In R, we can use the function 'comment()' to add a brief review as a comment to the list object.
+Below shows the code to accomplish this:
+
+```{r}
+# Create a list with named elements
+comment(restaurant_info) <- "Cantina 76 offers an array of tacos and mexican-inspired food that any person would love. Their quesadilla and BBQ brisket tacos are a must if you choose to stop by. I highly recommend anyone to come and try it out!" 
+
+# Print the list with the comment
+restaurant_info
+cat("Review:",comment(restaurant_info))
+```
+
+------------------------------------------------------------------------
+
+**12. Write code to count the number of students in your distance vector who live more than five miles from the University. (Hint: Use a relational operator with your distance vector and use the *sum* function.) Do this in one line to show the results without storing them.**
+
+Using R, we can count the number of students that is in our distance vector who live more than five miles from the university by using the 'sum' function.
+In the sum function we will need to specify how we would like R to count in that vector.
+
+```{r}
+# The 'distance > 5' tells R to report how many numbers in the vector are less than 5.
+sum(distance > 5)  
+```
+
+Looking at the result above we see that 2 students live more than five miles away from the University.
+
+------------------------------------------------------------------------
+
+**13. Write a line of code to determine if anyone in your distance vector lives more than 10 miles from the University.**
+
+The 'sum' function can be used to determine how many students live more than 10 miles away from the University.
+
+```{r}
+# The 'distance <10' tells R to report how many numbers in the vector are greater than 10.
+sum(distance < 10)  
+```
+
+The same function can be applied here.
+R tells us that there are 6 students who live more than 10 miles away from the University.
+
+------------------------------------------------------------------------
+
+**14. Import the Mount Holly Elementary Data into an object called *Student_Data*.**
+
+Using the 'read.csv(file.choose())' you are able to locate your desired file to be uploaded to R as a data frame.
+In the code below we are assigning this data to the object Student_Data.
+
+```{r}
+Student_Data <- read.csv(file.choose()) 
+```
+
+------------------------------------------------------------------------
+
+**15. What kind of object are the data stored in? Use R code to support your answer.**
+
+To check what kind of object the data was stored in we can used the 'class' function in R.
+
+```{r}
+class(Student_Data) 
+```
+
+R indicates that the data was stored in a data frame.
+
+------------------------------------------------------------------------
+
+**16. Find the class of each vector in Student_Data.**
+
+In order to find the class of each vector with our Student_Data data frame, we can use the 'sapply()' function in R, which will apply the 'class()' function to each column within the data frame.
+
+```{r}
+sapply(Student_Data, class) 
+```
+
+Here we see that our First.Name, Last.Name, and Gender variable is classified as a 'character' while variables like grade and score are 'integers'.
+
+**17. Change the vector of grade in Student_Data to be a factor.**
+
+If we want our Grade variable to be a factor instead of an integer then we can apply the 'as.factor()' function in R to change it.
+
+```{r}
+# Here we are telling R to locate the variable Grade within the data frame Student_Data using the $ and assign it with the # new class of a factor. 
+Student_Data$Grade <- as.factor(Student_Data$Grade)
+
+# We can now re-check the variable to see if it changed correctly
+class(Student_Data$Grade)
+```
+
+We can see that it was changed correctly into a factor.
+
+------------------------------------------------------------------------
+
+**18. What does R see as the levels of the grade factor? Use R code to support your answer.**
+
+To see what levels are assigned to the Grade factor we can use the 'levels()' function in R to help return the unique categories that are in the Grade variable.
+
+```{r}
+levels(Student_Data$Grade)
+```
+
+We can see that the levels assigned to the variable Grade are 3, 4, and 5.
+Indicating that these are students in third, fourth, fifth grade.
+
+------------------------------------------------------------------------
+
+**19. Conduct a *t* test to calculate a confidence interval for the difference in mean scores for males and females. Store the result in *t_result*.**
+
+We can use the 't.test()' function in R to calculate a confidence interval for the difference in mean scores between males and females.
+Below is an example of code:
+
+```{r}
+t_result <- t.test(Score ~ Gender, data = Student_Data)
+
+t_result
+```
+
+------------------------------------------------------------------------
+
+**20. What are the attributes of t_result? Use R code to support your answer.**
+
+If we want to retrieve the attributes of the t-test then we can use the 'attributes()' function like earlier in the assignment.
+
+```{r}
+# Get the attributes of the t_result object
+attributes(t_result)
+```
+
+------------------------------------------------------------------------
+
+**21. What is the class of t_result? Use R code to support your answer.**
+
+To find the class of the t-test we can again use the R function 'class()'.
+
+```{r}
+# Get the class of the t_result object
+class(t_result)
+```
+
+------------------------------------------------------------------------
+
+**22. Write code to calculate the number of students in the Mount Holly Elementary Data who are in the fourth grade. Do this in one line to show the results without storing them.**
+
+If we want to calculate the number of students in fourth grade then we can again use the 'sum()' function in R.
+
+```{r}
+# In the code we are specifying to locate the variable Grade within the Student Data frame and to count how many students  # are in fourth grade.
+sum(Student_Data$Grade == 4)
+```
+
+Here we see that there are 75 students in fourth grade.
+
+------------------------------------------------------------------------
+
+**23. Add a column to the Student_Data that contains each student's Z score.**
+
+In order for us to calculate a student's Z score we will need to use the formula below in the R code: $$
+Z = \frac{X - \mu}{\sigma}
+$$ Here is the R code to create a column that contains each student's Z score.
+
+```{r}
+# Calculate Z-scores for the Score column and add as a new column
+Student_Data$Z_Score <- (Student_Data$Score - mean(Student_Data$Score, na.rm = TRUE)) / sd(Student_Data$Score, na.rm = TRUE)
+
+# Using the 'colnames' function we can see that the Z_Score column was successfully added. 
+colnames(Student_Data)
+
+# The 'head' function will show us the first 6 rows of the data frame allowing us to see if there are values in the column.
+head(Student_Data)
+
+```
+
+------------------------------------------------------------------------
+
+**24. Write code to calculate how many of the Z scores are positive. Do this in one line to show the results without storing them.**
+
+Again we can use the 'sum()' function to have R find positive Z-Scores within the data frame.
+
+```{r}
+sum(Student_Data$Z_Score > 0)
+```
+
+We see that there are 108 students within the data frame that has a positive Z-Score.
+
+------------------------------------------------------------------------
+
+**25. Write code to determine if any students in this school have a first name of *Trevor*.**
+
+Using the 'any()' function we can have R find if 'Trevor' exist in our first.name variable.
+
+```{r}
+"Trevor" %in% Student_Data$First.Name
+```
+
+The result gave us a 'TRUE' indicating that there is a Trevor within our data frame.
+
+------------------------------------------------------------------------
