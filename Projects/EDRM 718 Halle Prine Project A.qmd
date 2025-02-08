@@ -1,0 +1,198 @@
+---
+title: "Style Guide"
+Author: "Halle Prine"
+format: html
+editor: visual
+---
+
+# Introduction
+
+Hello my name is Halle Prine and this will be my Style Guide for EDRM 718. The purpose of this guide is to help me record and document proper R programming language and organization skills.
+
+# Naming and Notation
+
+## File Names
+
+Your file names should be meaningful and concise with an .R at the end. The names of the files should also not be long or complicated. Examples of files names are as follows below:
+
+```         
+# A good file name
+Final_models.R
+
+# A bad/confusing file name 
+G_mod_27.R
+This_is_the_final_models_for_manuscript.R
+```
+
+A Good tip to keep documents in sequential order is to number them with a numeric prefix. Additionally, adding a date can also help you identify your latest r-script.
+
+```         
+# Sequential number order
+0-download.R
+1-phase.R
+
+# Adding a date 
+Final_models012225.R
+```
+
+## Object names
+
+When naming an object it is important to keep the name concise and easy to recognize. There should be now uppercase letters and the variable should be a noun. When naming a function the rule of thumb would be to naming them as a verb.
+
+```         
+# A good name
+student_mean
+
+# A bad name
+StUd__Mean
+MEAN._.Std
+```
+
+It would also be helpful to avoid names that are already existing functions within R. This will result in confusion and will pose to be a challenge for others trying to read your code. This infringes on reproducible research.
+
+```         
+# An example of this:
+std <- mean(x)
+
+mean <- function(x) sum(x)
+```
+
+# Syntax
+
+## Spacing
+
+Spacing in an r-script should be strategic and intentional. The use of spacing can either help an individual read your code better and or help you keep your script consistent and organized. Thus, there should be spaced around all infix operators (i.e., =, +, \<-, etc.) and after a comma.
+
+```         
+# Here is an example of good spacing 
+average <- mean(feet / 12 + inches, na.rm = TRUE)
+
+# This is an example of bad spacing
+average<-mean(feet/12+inches,na.rm=TRUE)
+```
+
+There is only one exception to this rule (i.e., :, :: and :::) which does ***NOT*** require spaces around them.
+
+```         
+# This is the correct spacing for :, ::, :::
+x <- 1:5
+base::get
+
+# This is the INCORRECT spacing for :, ::, :::
+X <- 1 : 5
+base : : get
+```
+
+When using parentheses, its important to put a space *before* the left parentheses, ***EXCEPT*** in a function call.
+
+```         
+# The correct spacing for a left parentheses
+if (debug) do(x)
+plot(x, y)
+
+#The incorrect spacing for a left parentheses
+if(debug)do(x)
+plot (x, y)
+```
+
+The use of extra spacing or indentations within a line of code is fine if it helps to align the code, equal signs, or assignments.
+
+```         
+list(
+  total = a + b + c,
+  mean = (a + b + c) / n
+)
+```
+
+It's important to note that we should not place spaces around code in parentheses or square brackets. However, if a comma is present, then we can still put a space like how it is shown in the example above.
+
+```         
+# The correct way to space in reference to parentheses or square brackets
+if (debug) do(x)
+diamonds[5, ]
+
+# The incorrect way to space in reference to parentheses or square brackets
+if ( debug ) do ( x )
+x[1,] # This has no space following the comma
+x[1 ,] # This has a space before the comma, however, we need the space to be after 
+```
+
+## Line Length
+
+A good rule to follow when it comes to code character length is keeping it to 80 characters per line. This will fit well on the page and will challenge you to be concise with your writing. The more concise you are the better your code will be.
+
+## Assignment
+
+When assigning operators/objects within your r code its important to use \<- instead of =, for the assignment. The = sign can be confusing and cause misinterpretations within your r script.
+
+```         
+# Correct assignment 
+x <- 3
+y <- "correct assignemnt"
+
+# Incorrect assignment
+x = 3
+y = "incorrect assignment"
+```
+
+# Organization
+
+The key component to any r script/document is organization. If there is inconsistencies in organization then this can cause confusion and lead to the inability to create reproducible science. One major way to keep organization within the document is to follow simple commenting rules.
+
+## Commenting Rules
+
+### Comments should be Consistent
+
+When comments lack consistency then the document itself can become hard to read and follow:
+
+```         
+# Here is an example of consistent comments -------------------------------------------------
+
+# Here I am commenting in a consitent manner, the spacing is nice and 
+# I make sure I am in the lines of the document 
+        # If I suddenly started to do this 
+        
+    # Or this...then it would be hard to read
+```
+
+### Comments should be Helpful
+
+A comment should summarize what the code is accomplishing. This is extremely helpful when you have complicated code.
+
+```         
+# An example of a helpful comment
+# Calculate pairwise agreement for each tier
+
+x <- tier_ratings
+k <- as.matrix(expand.grid(1:ncol(x),1:ncol(x))) 
+a1 <- as.data.frame(matrix(sapply(1:nrow(k), function(n) 
+  agree(x[,k[n,]])$value), nrow=ncol(x)))
+
+# An example of a comment that is not very useful:
+# Set MyVar to 5
+
+MyVar <- 5
+```
+
+### Comments should Document Changes/Time
+
+Lets say you have been developing a line of code and r script for your manuscript and throughout the process you would go in and alter code. Whenever you do so it may be important to document the date you went back into the line of code and comment what you had changed.
+
+```         
+#########################
+# Final Manuscript code
+# 1/02/25 
+#########################
+
+# Calculating a t-test 
+
+t_result <- t.test(Score ~ Gender, data = University_data)
+
+###################
+# Code alteration 
+# 1/15/25
+###################
+
+# Adding age within the t.test
+t_result <- t.test(Score ~ Age, data = University_data)
+```
