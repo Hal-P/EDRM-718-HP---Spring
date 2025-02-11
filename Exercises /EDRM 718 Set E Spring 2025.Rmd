@@ -1,0 +1,62 @@
+---
+title: "EDRM 718 Exercise Set E"
+output:
+  html_document:
+    df_print: paged
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+**For items 1 through 4 use the HSB2 data to illustrate how each of the four members of the *apply* family works. Do this by using the correct family member to accomplish each of the following tasks for the five test scores (not the entire data set). Make sure to use each family member for one, and only one, item.**
+
+***
+
+**1. Put the standard deviation (SD) of each test as an element in a list of the five SDs.**
+
+***
+
+**2. Create a vector of SDs for the five tests.**
+
+***
+
+**3. Create a vector of the standard deviation of the five test scores for each student in the sample.**
+
+***
+
+**4. Obtain SDs for the five tests by school type (i.e., public or private).**
+
+***
+
+**5. Using the list you created in item 1, store the reading standard deviation from this list in three new objects, *read_sd_1*, *read_sd_2*, and *read_sd_3* to demonstrate the use of these three operators: [ ], [[ ]], and $. Examine the class of each object and briefly explain why this is the class.**
+
+***
+
+**In an early exercise set you created vectors and a data frame that included the names of some of the members of our class, email addresses, and the distance we each travel to our class meetings. For the exercises below you will use these same data for all students in our class. (At least one member from each of the previous groups will need to share the data for their group. You may use the Research Cafe, or other means if you prefer, to do this.) You will use this combined data set for the following items, though you should just include the current members of our class. The class member profiles is current, so you can use that if you need a reminder of who is currently in the class.**
+
+***
+
+**6. Create a data frame named *our_class* that includes these variables, in order: *first_name*, *last_name*, *email*, *distance*.**
+
+***
+
+**7. Change our_class so that *last_name* is in the column before *first_name*. Do this without creating a new data frame.**
+
+***
+
+**9. Use *our_class* to create a new data frame called *far_members* that contains the data for class members who travel at least 10 miles to class.**
+
+***
+
+**10. Report the number of rows in the *far_members* data frame. Do not count by hand. Let R do the work.**
+
+***
+
+**11. The row names in *far_members* carried over from *our_class*. Change this so that they are in consecutive order. Write your code so it will work no matter how many rows are in *far_members*.**
+
+***
+
+**12. In one code statement, show all the information for the class member who travels the farthest to class. This should work even if we change the data in *our_class*.**
+
+***
