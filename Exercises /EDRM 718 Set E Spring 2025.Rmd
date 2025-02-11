@@ -1,5 +1,6 @@
 ---
 title: "EDRM 718 Exercise Set E"
+Author: "Halle Prine
 output:
   html_document:
     df_print: paged
@@ -7,29 +8,103 @@ output:
 
 *Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
 
-***
-
 **For items 1 through 4 use the HSB2 data to illustrate how each of the four members of the *apply* family works. Do this by using the correct family member to accomplish each of the following tasks for the five test scores (not the entire data set). Make sure to use each family member for one, and only one, item.**
+```{r include=FALSE}
+# The "here" library will let me read the data from an individual folder.
+library(psych)
+library(here)
+
+# I read the data and put it in an object called "legislators".
+
+students <- read.csv(here("Data", "hsb2.CSV"), header = TRUE, sep = ",") # Read the file
+
+# Examining the Variables for students 
+View(students)
+colnames(students)
+
+```
 
 ***
 
 **1. Put the standard deviation (SD) of each test as an element in a list of the five SDs.**
 
+```{r include=FALSE}
+# Select only the five test score columns 
+
+test_scores <- students[, c("read", "write", "math", "science", "socst")]
+
+# Compute SD using lapply() and store the results in a list 
+
+sd_list <- lapply(test_scores, sd)
+
+sd_list
+
+```
+
+
 ***
 
 **2. Create a vector of SDs for the five tests.**
+
+```{r include=FALSE}
+# Compute SD using sapply() and store the results in a vector
+
+sd_vector <- sapply(test_scores, sd)
+
+sd_vector
+
+```
 
 ***
 
 **3. Create a vector of the standard deviation of the five test scores for each student in the sample.**
 
+```{r include=FALSE}
+# Compute SD for each student (row-wise) using apply()
+
+sd_student <- apply(test_scores, 1, sd)
+
+sd_student
+
+```
+
+
 ***
 
 **4. Obtain SDs for the five tests by school type (i.e., public or private).**
 
+```{r include=FALSE}
+# Compute SDs for the five test scores grouped by school type
+sd_school <- aggregate(test_scores, by = list(students$schtyp), FUN = sd)
+
+# Rename the grouping column for clarity
+colnames(sd_school)[1] <- "School_Type"
+
+# Print the results
+sd_school
+
+```
+
 ***
 
 **5. Using the list you created in item 1, store the reading standard deviation from this list in three new objects, *read_sd_1*, *read_sd_2*, and *read_sd_3* to demonstrate the use of these three operators: [ ], [[ ]], and $. Examine the class of each object and briefly explain why this is the class.**
+
+```{r include=FALSE}
+# Extract the SD for reading using different operators
+read_sd_1 <- sd_list["read"]   # Using [ ]
+read_sd_1 
+
+read_sd_2 <- sd_list[["read"]] # Using [[ ]]
+read_sd_2
+
+read_sd_3 <- sd_list$read      # Using $
+read_sd_3
+
+# Examine the class of each extracted object
+class(read_sd_1)  # Check class of read_sd_1
+class(read_sd_2)  # Check class of read_sd_2
+class(read_sd_3)  # Check class of read_sd_3
+```
 
 ***
 
@@ -39,24 +114,97 @@ output:
 
 **6. Create a data frame named *our_class* that includes these variables, in order: *first_name*, *last_name*, *email*, *distance*.**
 
+```{r include=FALSE}
+# Create vectors for each variable
+first_name <- c("Adam", "Aishwanya", "Alison", "Beatrice", "Benny", "Brandi", 
+                "Emily", "Gitanjali", "Halle", "Irene", "Jongwon", "Julia", 
+                "Kaitlyn", "Kartik", "Matt", "Nestor", "Regin", "Saeed", 
+                "Samin", "Sayema", "Suprja", "Unum")
+
+last_name <- c("Brown", "Khemkar", "Scheide", "Quiroz", "Thomswarzecha",
+               "Byers", "Lorbach", "Lall", "Prine", "Esu", "Lee", "Barnes",
+               "Ramey", "Midha", "Marquiez auza","Urrea romero", "Dean", 
+               "Ahmadi", "Ashjael", "Akter", "Arikumar", "Aslam")
+
+email <- c("Adam.brown@moore.sc.edu", "akhemkar@email.sc.edu", 
+           "scheidea@mailbox.sc.edu", "bnquiroz@email.sc.edu",
+           "thomswab@email.sc.edu", "byersb@mailbox.sc.edu",
+           "lohrbach@email.sc.edu", "glall@email.sc.edu",
+           "hprine@email.sc.edu", "iesu@email.sc.edu",
+           "lee1125@sc.edu", "jab30@mailbox.sc.edu",
+           "ktramey@email.sc.edu", "kmidha@email.sc.edu",
+           "mateom@email.sc.edu", "nfu@email.sc.edu",
+           "regin@email.sc.edu", "ahmadis@email.sc.edu",
+           "sashjaei@email.sc.edu", "sakter@email.sc.edu",
+           "Srikumar@email.sc.edu", "uaslam@email.sc.edu")
+
+distance <- c(12, 1, 5, 5, 2, 19, 1, 1, 7, 1, 19, 2, 5, 3, 1, 2, 2, 0, 1, 1, 1,
+              2)
+
+# Combined vectors into a data frame
+our_class <- data.frame(first_name, last_name, email, distance)
+
+View(our_class)
+colnames(our_class)
+```
+
 ***
 
 **7. Change our_class so that *last_name* is in the column before *first_name*. Do this without creating a new data frame.**
+
+```{r include=FALSE}
+# Reorder columns so that last_name comes before first_name
+our_class <- our_class[, c("last_name", "first_name", "email", "distance")]
+
+# View order of column names
+colnames(our_class)
+```
 
 ***
 
 **9. Use *our_class* to create a new data frame called *far_members* that contains the data for class members who travel at least 10 miles to class.**
 
+```{r include=FALSE}
+# Create the far_members data frame by subsetting our_class
+far_members <- our_class[our_class$distance >= 10, ]
+
+# View far_members data frame
+View(far_members)
+```
+
 ***
 
 **10. Report the number of rows in the *far_members* data frame. Do not count by hand. Let R do the work.**
+
+```{r include=FALSE}
+# Report the number of rows in the far_members data frame
+num_rows <- nrow(far_members)
+
+num_rows
+```
 
 ***
 
 **11. The row names in *far_members* carried over from *our_class*. Change this so that they are in consecutive order. Write your code so it will work no matter how many rows are in *far_members*.**
 
+```{r include=FALSE}
+# Reset row names to be consecutive integers
+rownames(far_members) <- 1:nrow(far_members)
+
+# View far_members data frame
+View(far_members)
+```
+
+
 ***
 
 **12. In one code statement, show all the information for the class member who travels the farthest to class. This should work even if we change the data in *our_class*.**
+
+```{r include=FALSE}
+# Show all information for the class member who travels the farthest
+max_student <- our_class[which.max(our_class$distance), ]
+
+max_student
+```
 
 ***
