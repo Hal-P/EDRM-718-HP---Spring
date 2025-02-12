@@ -7,16 +7,12 @@ editor: visual
 
 ```{r include=FALSE}
 # The "here" library will let me read the data from an individual folder.
-library(psych)
 library(here)
 
 # I read the data and put it in an object called "legislators".
 
-legislators <- read.csv(here("Data", "legislators-current.CSV"), header = TRUE, sep = ",") # Read the file
+legislators <- read.csv(here("Data", "legislators-current.csv")) # Read the file
 
-# Examining the Variables
-View(legislators)
-colnames(legislators)
 ```
 
 ## Description
@@ -157,11 +153,25 @@ cbind(party_freq, party_prop)
 
 Further examining gender differences across political parties, we find that the Democratic affiliation has the most balanced gender distribution, with 57% male and 43% female. In contrast, the Republican affiliation is less evenly distributed, with approximately 84% and 16% female. Figure 4 presents this breakdown of gender representation by party affiliation.
 
+*Table 4. Proportion of Gender by Political Party within the Chambers of Congress.*
+
+```{r echo=FALSE}
+
+# Proactively getting data for stacked bar plots
+
+gender_party_table <- table(legislators$gender, legislators$party)
+gender_party_table
+
+gender_party_prop <- prop.table(gender_party_table,2)
+gender_party_prop
+```
+
+
 *Figure 4. Stacked Bar Graph of Proportion of Gender by Political Party within the Chambers of Congress.*
 
 ```{r echo=FALSE}
 
-barplot(gender_party_props, ylim = c(0, 1),
+barplot(gender_party_prop, ylim = c(0, 1),
         legend.text = FALSE, 
         col = c("lightblue", "palevioletred1"), 
         xlab = "Politcal Party", 
@@ -174,20 +184,21 @@ legend("topright",
        cex = .9)
 ```
 
-*Table 4. Proportion of Gender by Political Party within the Chambers of Congress.*
+Finally, to address the main purpose of this report we calculated the proportions of gender by position (Senate vs. House Representative) within the Chambers of Congress. Our main finding is that both chambers exhibit a similar male-to-female representation. In the Senate, 74% of members are male and 26% are female, while in the House of Representatives, the ratio is 70% male to 30% female. This finding is somewhat surprising, as we initially, speculated that the House of Representatives would have a significantly higher proportion of female members than the Senate, given that Senate positions often require more years of experience and accreditation-factors that women have only more recently had the opportunity to accumulate. Figure 5 illustrates these gender ratios by Senate and House of Representative using a stacked bar graph. Table 5 provides a more detialed breakdown of these proportions, further distinguishing gender representation within each chamber.
+
+*Table 5. Frequencies and Proportions of Gender by Position (Rep or Sen) within the Chambers of Congress.*
 
 ```{r echo=FALSE}
 
 # Proactively getting data for stacked bar plots
 
-gender_party_table <- table(legislators$gender, legislators$party)
-gender_party_table
+gender_type_table <- table(legislators$gender, legislators$type)
+gender_type_table
 
-gender_party_props <- prop.table(gender_party_table,2)
-gender_party_props
+gender_type_props <- prop.table(gender_type_table,2)
+gender_type_props
 ```
 
-Finally, to address the main purpose of this report we calculated the proportions of gender by position (Senate vs. House Representative) within the Chambers of Congress. Our main finding is that both chambers exhibit a similar male-to-female representation. In the Senate, 74% of members are male and 26% are female, while in the House of Representatives, the ratio is 70% male to 30% female. This finding is somewhat surprising, as we initially, speculated that the House of Representatives would have a significantly higher proportion of female members than the Senate, given that Senate positions often require more years of experience and accreditation-factors that women have only more recently had the opportunity to accumulate. Figure 5 illustrates these gender ratios by Senate and House of Representative using a stacked bar graph. Table 5 provides a more detialed breakdown of these proportions, further distinguishing gender representation within each chamber.
 
 *Figure 5. Stacked Bar Graph of Proportions of Gender by Position (Rep or Sen) within the Chambers of Congress.*
 
@@ -204,19 +215,6 @@ legend("topright",
        cex = .9)
 ```
 
-*Table 5. Frequencies and Proportions of Gender by Position (Rep or Sen) within the Chambers of Congress.*
-
-```{r echo=FALSE}
-
-# Proactively getting data for stacked bar plots
-
-gender_type_table <- table(legislators$gender, legislators$type)
-gender_type_table
-
-gender_type_props <- prop.table(gender_type_table,2)
-gender_type_props
-```
-
 ## Conclusion
 
 This report examined the gender composition and political affiliation within the Chambers of Congress, analyzing difference between the Senate and House of Representatives. Our findings indicate that both chambers have a similar male-to-female representation, with the Senate consisting of 74% male and 26% female and the House of Representatives at 70% male 30% female. This result was some what unexpected, as we initially speculated that the House would have a higher proportion of female representation due to the Senate's traditional higher experience and accreditation requirements.
@@ -229,5 +227,4 @@ Overall, this report provides insight into how gender and party affiliation inte
 
 Researchers from the University of South Carolina used a publicly available sample of 539 Chambers of Congress. "These findings are important," stated lead analyst Halle Prine, "because female representation in higher legislative positions allows for better advocacy for vulnerable female populations and promotes more well-rounded policy making."
 
-The main findings of the study show that more research needs to be conducted to investigate the relationship between gender and legislation positions. Specifically, research should further evaluate the relationship between state influence over gender representation.
-```
+The main findings of the study show that more research needs to be conducted to investigate the relationship between gender and legislation positions. Specifically, research should further evaluate the relationship between state influence over gender representation. \`\`\`
