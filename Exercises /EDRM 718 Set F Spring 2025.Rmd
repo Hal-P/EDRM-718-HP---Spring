@@ -1,0 +1,62 @@
+---
+title: "EDRM 718 Exercise Set F"
+output:
+  html_document:
+    df_print: paged
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+**These exercises refer to the *hsb2 data* that have been used in previous exercise sets.**
+
+***
+
+**1. Read in the *hsb2 data* and display the first 10 rows of the data set.**
+
+***
+
+**2. Extract the public school data and put these in a data frame called *public*. Extract the private school data and put these in a data frame called *private*.**
+
+***
+
+**3. Put just test scores for the public schools in a matrix called *public_scores*, with each column representing a different subject area. Name the columns by the subject area. Do the same for private schools to create *private_scores*.**
+
+***
+
+**4. Use a member of the apply family to create a vector *public_mean* and a vector *private_mean* that contain the means for the five tests for each type of school, respectively.**
+
+***
+
+**5. The *colMeans()* function will calculate the means of columns of scores. Use this function to create a vector *public_mean_2* and a vector *private_mean_2* that contain the means for the five tests for each type of school, respectively.**
+
+***
+
+**6. Use Boolean operators to determine if the class and type of *public_mean* is the same as that of *public_mean_2*. Also use a Boolean operator to determine if the class of *public_mean* is the same as the type of *public_mean*. Finally, use the *identical()* function to determine if *public_mean* and *public_mean_2* contain the same information.**
+
+***
+
+**7. Create a vector *public_sd* and a vector *private_sd* that contain the standard deviations for the five tests for each type of school, respectively.**
+
+***
+
+**8. Create a matrix of means and standard deviations called *public_stats* and another called *private_stats* for the public and private schools, respectively.**
+
+***
+
+**9. Create a well-labeled array named *hsb2_stats* that contains the means and standard deviations of public and private school students for the five tests in the hsb2 data. Each matrix should be named *Public* or *Private* and the statistics should be named as *Mean* and SD.**
+
+***
+
+**10. Create a list called *hsb2_info* that has two elements: a description of the array you created above and the actual array.**
+
+***
+
+**11. Illustrate how to display the description and the statistics contained in *hsb2_info* separately.**
+
+***
+
+**12. Extract the private school science mean from *hsb2_info*.**
+
+***
