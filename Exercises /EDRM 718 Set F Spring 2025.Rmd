@@ -1,11 +1,22 @@
 ---
 title: "EDRM 718 Exercise Set F"
+Author: "Halle Prine"
 output:
   html_document:
     df_print: paged
 ---
 
 *Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+```{r include=FALSE}
+# The "here" library will let me read the data from an individual folder.
+library(psych)
+library(here)
+
+# I read the data and put it in an object called "legislators".
+
+students <- read.csv(here("Data", "hsb2.CSV"), header = TRUE, sep = ",") # Read the file
+```
 
 ***
 
@@ -15,48 +26,213 @@ output:
 
 **1. Read in the *hsb2 data* and display the first 10 rows of the data set.**
 
+```{r include=FALSE}
+# The "here" library will let me read the data from an individual folder.
+library(psych)
+library(here)
+
+# I read the data and put it in an object called "legislators".
+
+students <- read.csv(here("Data", "hsb2.CSV"), header = TRUE, sep = ",") # Read the file
+
+# Display the first 10 rows using Head and specify the 10 in the ()
+
+head(students, 10)
+```
+
 ***
 
 **2. Extract the public school data and put these in a data frame called *public*. Extract the private school data and put these in a data frame called *private*.**
+
+```{r include=FALSE}
+# Extract public school data
+public <- subset(students, schtyp == 1)
+
+# Extract private school data
+private <- subset(students, schtyp == 2)
+
+# Display the first few rows of each dataset
+head(public)
+head(private)
+```
 
 ***
 
 **3. Put just test scores for the public schools in a matrix called *public_scores*, with each column representing a different subject area. Name the columns by the subject area. Do the same for private schools to create *private_scores*.**
 
+```{r include=FALSE}
+# Select only test score columns for public schools and convert to matrix
+public_scores <- as.matrix(public[, c("read", "write", "math", "science", "socst")])
+colnames(public_scores) <- c("Reading", "Writing", "Math", "Science", "Social Studies")
+
+# Select only test score columns for private schools and convert to matrix
+private_scores <- as.matrix(private[, c("read", "write", "math", "science", "socst")])
+colnames(private_scores) <- c("Reading", "Writing", "Math", "Science", "Social Studies")
+
+
+public_scores
+private_scores
+```
+
 ***
 
 **4. Use a member of the apply family to create a vector *public_mean* and a vector *private_mean* that contain the means for the five tests for each type of school, respectively.**
+
+```{r include=FALSE}
+# Calculate mean test scores for public schools using apply
+public_mean <- apply(public_scores, 2, mean)
+
+# Calculate mean test scores for private schools using apply
+private_mean <- apply(private_scores, 2, mean)
+
+# Display the results
+public_mean
+private_mean
+```
 
 ***
 
 **5. The *colMeans()* function will calculate the means of columns of scores. Use this function to create a vector *public_mean_2* and a vector *private_mean_2* that contain the means for the five tests for each type of school, respectively.**
 
+```{r include=FALSE}
+# Calculate mean test scores for public schools using colMeans
+public_mean_2 <- colMeans(public_scores)
+
+# Calculate mean test scores for private schools using colMeans
+private_mean_2 <- colMeans(private_scores)
+
+# Display the results
+public_mean_2
+private_mean_2
+```
+
 ***
 
 **6. Use Boolean operators to determine if the class and type of *public_mean* is the same as that of *public_mean_2*. Also use a Boolean operator to determine if the class of *public_mean* is the same as the type of *public_mean*. Finally, use the *identical()* function to determine if *public_mean* and *public_mean_2* contain the same information.**
+
+```{r include=FALSE}
+# Check if the class and type of public_mean is the same as that of public_mean_2
+class_public_mean <- (class(public_mean) == class(public_mean_2))  # Boolean comparison of class
+class_public_mean # TRUE they are the same class
+
+type_public_mean <- (typeof(public_mean) == typeof(public_mean_2))  # Boolean comparison of type
+type_public_mean # TRUE they are the same type
+
+# Check if the class of public_mean is the same as its type
+class_type <- (class(public_mean) == typeof(public_mean))
+class_type # FALSE it is NOT the same type 
+
+# Check if public_mean and public_mean_2 contain the same information
+identical_public_mean <- identical(public_mean, public_mean_2)
+identical_public_mean # TRUE they both have the same information
+```
 
 ***
 
 **7. Create a vector *public_sd* and a vector *private_sd* that contain the standard deviations for the five tests for each type of school, respectively.**
 
+```{r include=FALSE}
+# Calculate standard deviations for public schools
+public_sd <- apply(public_scores, 2, sd)
+
+# Calculate standard deviations for private schools
+private_sd <- apply(private_scores, 2, sd)
+
+# Display the results
+public_sd
+private_sd
+```
+
 ***
 
 **8. Create a matrix of means and standard deviations called *public_stats* and another called *private_stats* for the public and private schools, respectively.**
+
+```{r include=FALSE}
+# Create matrix for public school statistics
+public_stats <- rbind(public_mean, public_sd)
+
+# Create matrix for private school statistics
+private_stats <- rbind(private_mean, private_sd)
+
+# Name the rows for clarity
+rownames(public_stats) <- c("Mean", "SD")
+rownames(private_stats) <- c("Mean", "SD")
+
+# Display the matrices
+public_stats
+private_stats
+```
+
 
 ***
 
 **9. Create a well-labeled array named *hsb2_stats* that contains the means and standard deviations of public and private school students for the five tests in the hsb2 data. Each matrix should be named *Public* or *Private* and the statistics should be named as *Mean* and SD.**
 
+```{r include=FALSE}
+
+# Create the array with public and private statistics
+hsb2_stats <- array(
+  c(public_stats, private_stats),  # Combine public and private matrices
+  dim = c(2, 5, 2),  # 2 rows (Mean, SD), 5 columns (Subjects), 2 matrices (Public, Private)
+  dimnames = list(
+    c("Mean", "SD"),  # Row names
+    colnames(public_stats),  # Column names (Subjects)
+    c("Public", "Private")  # Matrix names (School Type)
+  )
+)
+
+# Display the array
+hsb2_stats
+```
+
 ***
 
 **10. Create a list called *hsb2_info* that has two elements: a description of the array you created above and the actual array.**
+
+```{r include=FALSE}
+# Create a description of the array
+description <- "This array contains the means and standard deviations of test scores for public and private school students across five subjects."
+
+# Create the list with two elements
+hsb2_info <- list(
+  Description = description,
+  Stats_Array = hsb2_stats
+)
+
+# Display the list
+hsb2_info
+```
 
 ***
 
 **11. Illustrate how to display the description and the statistics contained in *hsb2_info* separately.**
 
+```{r include=FALSE}
+# Display the description
+Description.1 <- hsb2_info$Description
+Description.1
+# OR
+Description.2 <- hsb2_info[[1]]
+Description.2
+
+# Display the statistics array
+stats_array.1 <- hsb2_info$Stats_Array
+stats_array.1
+# OR
+stats_array.2 <- hsb2_info[[2]]
+stats_array.2
+```
+
 ***
 
 **12. Extract the private school science mean from *hsb2_info*.**
+
+```{r include=FALSE}
+# Extract the private school science mean
+private_science_mean <- hsb2_info$Stats_Array["Mean", "Science", "Private"]
+
+# Display the result
+private_science_mean
+```
 
 ***
