@@ -1,0 +1,231 @@
+---
+title: "Project D - The Relationship of SES and Reading Scores of High School Seniors"
+author: "Halle Prine"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r include=FALSE}
+
+# The "here" library will let me read the data from an individual folder.
+library(dplyr)
+library(tidyr)
+library(here)
+
+# I read the data and put it in an object called "students".
+
+students <- read.csv(here("Data", "hsb2.csv"), header = TRUE, sep = ",")
+
+# Select only the five standardized test score columns 
+test_scores <- students[, c("read", "write", "math", "science", "socst")]
+
+# Creating a data frame that has the test scores:
+test_summary <- data.frame(
+  Test = colnames(test_scores),
+  Min = apply(test_scores, 2, min, na.rm = TRUE),
+  Q1 = apply(test_scores, 2, function(x) quantile(x, 0.25, na.rm = TRUE)),
+  Median = apply(test_scores, 2, median, na.rm = TRUE),
+  Q3 = apply(test_scores, 2, function(x) quantile(x, 0.75, na.rm = TRUE)),
+  Max = apply(test_scores, 2, max, na.rm = TRUE),
+  Mean = round(colMeans(test_scores, na.rm = TRUE), 1),
+  SD = round(apply(test_scores, 2, sd, na.rm = TRUE), 1)
+)
+
+head(test_summary)
+```
+
+### Description
+
+This brief report will examine the test score from five standardized tests given across high school seniors. The first aim is to provide descriptive statistics of each test and the second aim is to evaluate these statistics from each test.
+
+*Source of data: The "HSB2 data set" provided by Dr. Micheal Seaman.*
+
+### Analysis
+
+In this data set, the standardized tests are divided into 5 subjects: reading, writing, science, math and science. Figure 1 illustrates the scores across the standardized tests.
+
+***
+*Figure 1. Box plots across the standardized test scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("read", "write", "math", "science", "socst")], 
+        main = "Distribution of Test Scores", 
+        ylab = "Scores", 
+        col = c("lightblue", "lightgreen", "lightpink", "lightyellow", "lightgray"))
+
+```
+
+***
+
+```{r include=FALSE}
+# I put the frequencies and proportions in a table, but there are only a few
+# of these so I put those in a narrative instead of showing the table.
+
+cbind(ses.counts, ses.props)
+
+# To calculate the confidence intervals for the SES groups, I am going to
+# need the total in the sample.
+
+ses.total <- sum(ses.counts)
+
+# Now I can calculate each of the individual confidence intervals for SES
+# groups.
+
+prop.test(ses.counts[1], ses.total)
+prop.test(ses.counts[2], ses.total)
+prop.test(ses.counts[3], ses.total)
+```
+
+The sample consists of 23.5% in the low SES category, 47.5% in the middle SES category, and 29.0% in the high SES category. From these estimates I can infer, with 95% confidence, that the proportion of high school seniors who come from families in the low SES category is between 0.18 and 0.30. Similarly, the proportion of high school seniors who come from the middle SES category is between 0.40 and 0.55, and the proportion from the high SES category is between 0.23 and 0.36.
+
+Figure 2 illustrates how reading test scores are related to SES categories. From this we can see that the central tendency of the reading scores in the high SES category outperforms that of the middle SES category, which in turn outperforms the low SES category. Additionally, the variation is similar for each of the categories.
+
+***
+
+*Figure 2. Side-by-side boxplots illustrating reading test scores for SES categories.*
+
+```{r echo=FALSE}
+# This command creates side-by-side boxplots.
+
+boxplot(students$read ~ students$ses,
+        ylim = c(20, 80),        
+        xlab = "SES Level",
+        ylab = "Reading Score")
+```
+
+***
+
+Table 1 is a table of descriptive statistics for reading test scores in each of the three SES categories. For every measure of location (i.e. every statistic in the table except the standard deviation), the change to a higher SES is associated with an increase in the statistic for the reading test scores. That is, the change in SES is associated with a change in reading test scores across the range of test scores. For example, the mean for the middle SES students is about 4 points higher than for low SES students. Similarly, the mean for the students in the high SES group is about 4 points higher than for the middle SES group.
+
+***
+
+*Table 1. Statistics for each of the three SES categories.*
+
+```{r echo=FALSE}
+# I calculated descriptive statistics for reading scores of SES groups.
+
+Mean <- tapply(students$read, students$ses, mean)
+SD <- tapply(students$read, students$ses, sd)
+Min <- tapply(students$read, students$ses, min)
+Q1 <- tapply(students$read, students$ses, quantile, p = 0.25)
+Med <-  tapply(students$read, students$ses, median)
+Q3 <- tapply(students$read, students$ses, quantile, p = 0.75)
+Max <- tapply(students$read, students$ses, max)
+
+# I then created a "column bind" to put these in a table. The "round" function
+# eliminates the decimal points to provide numbers easier to read and remember.
+
+round(cbind(Mean, SD, Min, Q1, Med, Q3, Max))
+```
+
+***
+
+```{r include=FALSE}
+# To construct confidence intervals for the differences among the different SES
+# categories for reading score means, I first need to create subsets with two
+# of the categories at a time, so that I can take the difference of two means.
+# Yet before I can do that, I need to subset out each category individually.
+
+ses.low = subset(students, students$ses == "Low")
+ses.med = subset(students, students$ses == "Middle")
+ses.high = subset(students, students$ses == "High")
+
+# Now that I have subsets with the separate categories, I can combine them into
+# sets of two groups at a time. I do this by "binding" the rows of the two
+# categories into one set of data using the rbind() function.
+
+ses.low.med <- rbind(ses.low, ses.med)
+ses.low.high <- rbind(ses.low, ses.high)
+ses.med.high <- rbind(ses.med, ses.high)
+
+# Now I can run t tests for the response variable, reading, as a function of
+# the explanatory variable, SES category.
+
+t_test_low_med <- t.test(ses.low.med$read ~ ses.low.med$ses)
+t_test_low_high <- t.test(ses.low.high$read ~ ses.low.high$ses)
+t_test_med_high <- t.test(ses.med.high$read ~ ses.med.high$ses)
+```
+
+From these data, I estimate, with 95% confidence, that students who come from middle SES families will, on average, score between `r round(abs(t_test_low_med$conf.int[2]),0)` and `r round(abs(t_test_low_med$conf.int[1]),0)` points higher than those from low SES families. I estimate with the same confidence that students who come from high SES families will, on average, score between `r round(abs(t_test_low_high$conf.int[2]),0)` and `r round(abs(t_test_low_high$conf.int[1]),0)` points higher than students from low SES families and between `r round(abs(t_test_med_high$conf.int[2]),0)` and `r round(abs(t_test_med_high$conf.int[1]),0)` points higher than students from middle SES families. Thus, the trend that I see in the sample of increasing reading score means with increasing SES wealth, I can infer to the population as well.
+
+The sample data also includes four ethnic categories: Hispanic, Asian, African American, and white. The relationship of SES to ethnic group is illustrated in Figure 3.
+
+***
+
+*Figure 3. Bar plots with percent of each SES category within ethnic groups.*
+
+```{r echo=FALSE}
+# This constructs a two-way table of frequencies.
+
+ses.race.counts = table(students$ses, students$race)
+
+# This constructs conditional percentages (conditioned on ethnic group) of
+# SES categories.
+
+ses.race.percents = 100*prop.table(ses.race.counts, 2)
+
+# This provides a stacked bar graph.
+
+barplot(ses.race.percents,
+        xlab = "Ethnic Group",
+        ylab = "Percents",
+        legend = c("Low", "Middle", "High"),
+        args.legend = list(title = "SES", cex = .7))
+```
+
+***
+
+Table 2 provides the percentages of each SES within each ethnic group. It is apparent that there is a relationship of SES and ethnicity. A relatively low percentage of whites are in the low SES category, whereas the percentages of non-white ethnic groups in the low SES categories are substantially higher than for whites; in fact, it is three times higher for African Americans.
+
+***
+
+*Table 2. Percent of each SES classification within each of four ethnic groups.*
+
+```{r echo=FALSE}
+# This provides percents. The "round" function eliminates decimal points to
+# make the numbers easier to read and remember.
+
+round(ses.race.percents)
+```
+
+***
+
+```{r include=FALSE}
+# For Confidence intervals to compare the population proportion  of each
+# category of SES for African American students  and white students, we can
+# pull out the counts we need to  create these intervals. Let's first get
+# the total counts for each race.
+
+race.counts <- table(students$race)
+
+# Here is the comparison for low SES. This tells us to compare columns 3 and
+# 4 in the first row, using the totals in columns 3 and 4 as the totals for
+# African-American and White high school students in the sample.
+
+prop.test(ses.race.counts[1,3:4], race.counts[3:4])
+
+# Here's for middle SES.
+
+prop.test(ses.race.counts[2,3:4], race.counts[3:4])
+
+# Here's for high SES
+
+prop.test(ses.race.counts[3,3:4], race.counts[3:4])
+```
+
+From these data we can infer with 95% confidence the percentage of African-American high school students who come from a low SES home is 13 to 64 percentage points higher than the percentage of white high school students who come from low SES homes. The percentage of African-American high school students who come from middle SES homes is anywhere from 4 percentage points higher to 45 percentage points lower than the percentage of white students who come from middle SES homes. Finally, the percentage of African-American high school students who come from high SES homes is somewhere between 2 percentage points higher to 38 percentage points lower than white students who come from high SES homes. Taken collectively, there is strong evidence that white students come from homes of higher wealth in higher proportions than African-American students.
+
+### Conclusions
+
+I examined whether reading test scores are related to socioeconomic classification. The answer is “yes.” As socioeconomic status increases, the reading test scores also increase. This is true across the range of the reading test score spectrum. For example, the mean for the middle SES students is about 4 points higher than for low SES students. Similarly, the mean for the students in the high SES group is about 4 points higher than for the middle SES group. This upward shift has very little influence on the width of the distribution of scores, so it is an “across the board” shift. When taking into account the sampling variability of our estimates, we can still say with 95% confidence that, as an example, students from high SES backgrounds will score an average between 4 and 12 points higher than students from low SES backgrounds.
+
+As a secondary question, I also looked at the relationship of SES to ethnic groups, finding that there is a clear relationship. A substantially higher percentage of white students come from higher SES homes than their Hispanic, Asian, and, most especially, African American counterparts. As an example, the percentage of African American high school seniors from low SES homes is more than three times the percentage of white seniors from low SES homes. Based on these estimates and the margin of error, I expect to see similar trends in the nation as I do in the sample. This relationship may help explain differences in reading scores for various ethnic groups, though that was not the focus of this report and more study will be needed to confirm that this is the case.
+
+### Press Release
+
+Researchers at the University of South Carolina used a national sample of 200 high school seniors to study the relationship of socioeconomic status to reading test scores. “These findings are important,” stated lead analyst Mike Seaman, “because SES widely varies and could be related to school resources and instructional environment.” Seaman said that about half of the seniors are from middle-income homes, with the other half about evenly split between high- and low-income homes. “That’s not a complete picture,” he said, “because the distribution is very different for different ethnic groups. For example, the percentage of African American seniors in low-income homes is over three times the percentage of whites in low-income homes.”
+
+The main findings of the study show that there is indeed a relationship of SES to reading test scores, with test scores increasing as income-level increases. Seaman reports the difference in average reading test scores for seniors from a high SES environment is about 8 points higher than that of seniors from a low SES home.
