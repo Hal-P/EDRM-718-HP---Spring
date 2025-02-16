@@ -10,8 +10,6 @@ output:
 ```{r include=FALSE}
 
 # The "here" library will let me read the data from an individual folder.
-library(dplyr)
-library(tidyr)
 library(here)
 
 # I read the data and put it in an object called "students".
@@ -32,8 +30,6 @@ test_summary <- data.frame(
   Mean = round(colMeans(test_scores, na.rm = TRUE), 1),
   SD = round(apply(test_scores, 2, sd, na.rm = TRUE), 1)
 )
-
-head(test_summary)
 ```
 
 ### Description
@@ -44,10 +40,296 @@ This brief report will examine the test score from five standardized tests given
 
 ### Analysis
 
-In this data set, the standardized tests are divided into 5 subjects: reading, writing, science, math and science. Figure 1 illustrates the scores across the standardized tests.
+In this data set, the standardized tests are divided into 5 subjects: reading, writing, science, math and science. For the purpose of this report we will first examine each standardize test using a five-number summary, mean and the standard deviation. Then we will compare each test to one another and report each mean and standard deviations, as well as the 95% confidence intervals for the means in the larger population. 
+
+Figure 1 illustrates the distribution of standardized reading test scores. The median reading score is approximately 75, which suggests that the middle student scored around this value. The box extends from 65 (Q1) to 85 (Q3), indicating that 50% of the students scores lie within this range. The whiskers extend from 55 to 95, showing that the lowest and highest scores within the normal range (1.5*IQR from the quadrilles) are between these values. Table 1 summarizes the math score's five-number descriptive statistics. 
+
+
+```{r include=FALSE}
+
+Read_table <- round(rbind(
+  Read = c(
+    Mean = mean(test_scores$read, na.rm = TRUE),
+    SD = sd(test_scores$read, na.rm = TRUE),
+    Min = min(test_scores$read, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$read, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$read, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$read, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$read, na.rm = TRUE)
+  )
+), 1)  # Rounding to 1 decimal place
+
+Read_table
+
+```
+
+
+*Figure 1. Box plot for Standardized Reading Test Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("read")], 
+        main = "Distribution of Reading Test Scores", 
+        ylab = "Scores", 
+        col = c("lightblue"))
+
+```
+
+
+*Table 1. Statistics for each of the reading standardized test.*
+
+```{r echo=FALSE}
+
+Read_table <- round(rbind(
+  Read = c(
+    Mean = mean(test_scores$read, na.rm = TRUE),
+    SD = sd(test_scores$read, na.rm = TRUE),
+    Min = min(test_scores$read, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$read, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$read, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$read, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$read, na.rm = TRUE)
+  )
+), 1)  # Rounding to 1 decimal place
+
+Read_table
+
+```
+
+
+Figure 2 illustrates the distribution of standardized writing test scores. The median writing score is around 70 indicating that half of the students scored below this and half above. The interquartile range is from 60 to 80, with most of the students scoring within this range. Examining the whiskers on the right are slightly longer than those on the left. This indicates a slight postive (right) skew in the data. This suggests that only a fe students scored much higher than the majority. Table 2 summarizes these descriptive statsitics. 
+
+
+
+```{r include=FALSE}
+
+# Write Table
+Write_table <- round(rbind(
+  Write = c(
+    Mean = mean(test_scores$write, na.rm = TRUE),
+    SD = sd(test_scores$write, na.rm = TRUE),
+    Min = min(test_scores$write, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$write, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$write, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$write, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$write, na.rm = TRUE)
+  )
+), 1)
+
+Write_table
+
+```
+
+
+
+*Figure 2. Box plot for Standardized Writing Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("write")], 
+        main = "Distribution of Writing Test Scores", 
+        ylab = "Scores", 
+        col = c("lightgreen"))
+
+```
+
+
+*Table 2. Statistics for each of the reading standardized test.*
+
+```{r echo=FALSE}
+
+# Write Table
+Write_table <- round(rbind(
+  Write = c(
+    Mean = mean(test_scores$write, na.rm = TRUE),
+    SD = sd(test_scores$write, na.rm = TRUE),
+    Min = min(test_scores$write, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$write, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$write, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$write, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$write, na.rm = TRUE)
+  )
+), 1)
+
+Write_table
+
+```
+
+Figure 3 illustrates the distribution of standardized math test scores. The median math score is around 78 indicating that most students are concentrated around this score. The interquartile range is from 70 to 90, showing that most students scored between these values. The whiskers extend from 60 to 95, indicating the range of the scores that are not considered outliers. Table 3 summarizes these descriptive statsitics. 
+
+
+```{r include=FALSE}
+
+# Math Table
+Math_table <- round(rbind(
+  Math = c(
+    Mean = mean(test_scores$math, na.rm = TRUE),
+    SD = sd(test_scores$math, na.rm = TRUE),
+    Min = min(test_scores$math, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$math, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$math, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$math, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$math, na.rm = TRUE)
+  )
+), 1)
+
+Math_table
+
+```
+
+
+*Figure 3. Boxplot for Standardized Math Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("math")], 
+        main = "Distribution of Writing Test Scores", 
+        ylab = "Scores", 
+        col = c("lightpink"))
+
+```
+
+
+
+*Table 3. Statistics for Standardized Math Scores.*
+
+```{r echo=FALSE}
+
+# Math Table
+Math_table <- round(rbind(
+  Math = c(
+    Mean = mean(test_scores$math, na.rm = TRUE),
+    SD = sd(test_scores$math, na.rm = TRUE),
+    Min = min(test_scores$math, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$math, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$math, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$math, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$math, na.rm = TRUE)
+  )
+), 1)
+
+Math_table
+
+```
+
+
+Next we will evaluate the standarized science test scores. Figure 3 demonstrates the distribution of standardized science test scores. The median science score is around 80, this suggests that this is the median score received. The IQR is from 70 to 90, meaning that half of the students scored between 70 and 90. The boxplot appears to be fairly symetric and there are no significnat outliers in the science scores. Table 3 summarizes these descriptive statsitics. 
+
+
+
+```{r include=FALSE}
+
+# Science Table
+Science_table <- round(rbind(
+  Science = c(
+    Mean = mean(test_scores$science, na.rm = TRUE),
+    SD = sd(test_scores$science, na.rm = TRUE),
+    Min = min(test_scores$science, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$science, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$science, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$science, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$science, na.rm = TRUE)
+  )
+), 1)
+
+Science_table
+
+```
+
+
+*Figure 3. Boxplot for Standardized Science Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("science")], 
+        main = "Distribution of Scicene Test Scores", 
+        ylab = "Scores", 
+        col = c("lightyellow"))
+
+```
+
+*Table 3. Statistics for Standardized Science Scores.*
+
+```{r echo=FALSE}
+
+# Science Table
+Science_table <- round(rbind(
+  Science = c(
+    Mean = mean(test_scores$science, na.rm = TRUE),
+    SD = sd(test_scores$science, na.rm = TRUE),
+    Min = min(test_scores$science, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$science, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$science, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$science, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$science, na.rm = TRUE)
+  )
+), 1)
+
+Science_table
+
+```
+
+
+Finally the last standardize test we will be evaluating independently is student's social studies test scores. Figure 4 depicts the distribution of standardized social studies  test scores. The mediam social studies score in around 72 and the IQR is between 62 and 82, indicating that most student's scores fell between these two values. Table 4 ummarizes the five-number descriptive statsitics of this standardize test. 
+
+
+```{r include=FALSE}
+
+# Social Studies Table
+Socst_table <- round(rbind(
+  Socst = c(
+    Mean = mean(test_scores$socst, na.rm = TRUE),
+    SD = sd(test_scores$socst, na.rm = TRUE),
+    Min = min(test_scores$socst, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$socst, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$socst, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$socst, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$socst, na.rm = TRUE)
+  )
+), 1)
+
+Socst_table
+
+```
+
+
+*Figure 4. Boxplot for Standardized Social Studies Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("socst")], 
+        main = "Distribution of Social Studies Test Scores", 
+        ylab = "Scores", 
+        col = c("lightgray"))
+
+```
+
+*Table 4. Statistics for Standardized Social Studies Scores.*
+
+```{r echo=FALSE}
+
+# Social Studies Table
+Socst_table <- round(rbind(
+  Socst = c(
+    Mean = mean(test_scores$socst, na.rm = TRUE),
+    SD = sd(test_scores$socst, na.rm = TRUE),
+    Min = min(test_scores$socst, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$socst, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$socst, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$socst, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$socst, na.rm = TRUE)
+  )
+), 1)
+
+Socst_table
+
+```
+
+
+Finally, we compared each standardize test to one another to reveal the distributions of test scores across the students. Figure 5 is a side by side boxplot that reveals these key differences in test scores. We find that science and math have the highest medians (80 and 78), indicating students had a strong performance with greater variability, seen by their wide IQRs. Student's writing scores had the lowest median (70) and a more consistent spread, but it is slightly skewed. Social studies had a median of 72, with a narrower IQR and high outliers. Reading shows symmetry, however, it includes a high outlier. Additionally, we calcuated each test's 95% confidence interval which is summarized in table 5. 
 
 ***
-*Figure 1. Box plots across the standardized test scores.*
+*Figure 5. Side by Side Boxplots Across the Standardized Test Scores.*
 
 ```{r echo=FALSE}
 # Boxplot for test scores
@@ -58,174 +340,45 @@ boxplot(students[, c("read", "write", "math", "science", "socst")],
 
 ```
 
-***
 
-```{r include=FALSE}
-# I put the frequencies and proportions in a table, but there are only a few
-# of these so I put those in a narrative instead of showing the table.
-
-cbind(ses.counts, ses.props)
-
-# To calculate the confidence intervals for the SES groups, I am going to
-# need the total in the sample.
-
-ses.total <- sum(ses.counts)
-
-# Now I can calculate each of the individual confidence intervals for SES
-# groups.
-
-prop.test(ses.counts[1], ses.total)
-prop.test(ses.counts[2], ses.total)
-prop.test(ses.counts[3], ses.total)
-```
-
-The sample consists of 23.5% in the low SES category, 47.5% in the middle SES category, and 29.0% in the high SES category. From these estimates I can infer, with 95% confidence, that the proportion of high school seniors who come from families in the low SES category is between 0.18 and 0.30. Similarly, the proportion of high school seniors who come from the middle SES category is between 0.40 and 0.55, and the proportion from the high SES category is between 0.23 and 0.36.
-
-Figure 2 illustrates how reading test scores are related to SES categories. From this we can see that the central tendency of the reading scores in the high SES category outperforms that of the middle SES category, which in turn outperforms the low SES category. Additionally, the variation is similar for each of the categories.
-
-***
-
-*Figure 2. Side-by-side boxplots illustrating reading test scores for SES categories.*
+*Table 6. Table of 95% Confidence Intervals for each Standardized Test.*
 
 ```{r echo=FALSE}
-# This command creates side-by-side boxplots.
 
-boxplot(students$read ~ students$ses,
-        ylim = c(20, 80),        
-        xlab = "SES Level",
-        ylab = "Reading Score")
+# Calculate 95% CI using t.test for each test score
+Read_CI <- t.test(test_scores$read)$conf.int
+Write_CI <- t.test(test_scores$write)$conf.int
+Math_CI <- t.test(test_scores$math)$conf.int
+Science_CI <- t.test(test_scores$science)$conf.int
+Socst_CI <- t.test(test_scores$socst)$conf.int
+
+# Combine results into a table
+CI_table <- round(rbind(Read_CI, Write_CI, Math_CI, Science_CI, Socst_CI), 2)
+colnames(CI_table) <- c("Lower_CI", "Upper_CI")
+rownames(CI_table) <- c("Read", "Write", "Math", "Science", "Socst")
+
+# Print the table
+print(CI_table)
+
+
 ```
+Based on the 95% confidence intervals for each of the test scores we can make the following estimates about the larger population:
 
-***
+Regarding the standardized reading test scores we estimate with a 95% confidence that the average score in the student population will fall between
+`r round(Read_CI[1], 1)` and `r round(Read_CI[2], 1)` points. This suggests that the average performance on the reading test is relatively low, with a narrow range of possible scores. 
 
-Table 1 is a table of descriptive statistics for reading test scores in each of the three SES categories. For every measure of location (i.e. every statistic in the table except the standard deviation), the change to a higher SES is associated with an increase in the statistic for the reading test scores. That is, the change in SES is associated with a change in reading test scores across the range of test scores. For example, the mean for the middle SES students is about 4 points higher than for low SES students. Similarly, the mean for the students in the high SES group is about 4 points higher than for the middle SES group.
+Similarly, for writing, the 95% confidence interval for the mean is between `r round(Write_CI[1], 1)` and `r round(Write_CI[2], 1)` points. This indicates that the writing test scores are somewhat higher than the reading, with a slightly wider range, indicating theres a small degree of variability as well within the student;s performance.
 
-***
+The student's math test scores had a 95% confidence interval for a mean score is between `r round(Math_CI[1], 1)` and `r round(Math_CI[2], 1)` points. Like their writing and math test scores we see similar trends of a moderate performance. 
 
-*Table 1. Statistics for each of the three SES categories.*
+In science, the 95% confidence interval for the mean score falls between `r round(Science_CI[1], 1)` and `r round(Science_CI[2], 1)` points. The science test scores seem to be consistent with the reading scores, with a slightly lower average.
 
-```{r echo=FALSE}
-# I calculated descriptive statistics for reading scores of SES groups.
+Finally, for social studies, the 95% confidence interval for the mean score is between `r round(Socst_CI[1], 1)` and `r round(Socst_CI[2], 1)` points. This suggests that social studies scores was in line with the other subjects, with the true population mean likely falling within this interval. 
 
-Mean <- tapply(students$read, students$ses, mean)
-SD <- tapply(students$read, students$ses, sd)
-Min <- tapply(students$read, students$ses, min)
-Q1 <- tapply(students$read, students$ses, quantile, p = 0.25)
-Med <-  tapply(students$read, students$ses, median)
-Q3 <- tapply(students$read, students$ses, quantile, p = 0.75)
-Max <- tapply(students$read, students$ses, max)
 
-# I then created a "column bind" to put these in a table. The "round" function
-# eliminates the decimal points to provide numbers easier to read and remember.
 
-round(cbind(Mean, SD, Min, Q1, Med, Q3, Max))
-```
-
-***
-
-```{r include=FALSE}
-# To construct confidence intervals for the differences among the different SES
-# categories for reading score means, I first need to create subsets with two
-# of the categories at a time, so that I can take the difference of two means.
-# Yet before I can do that, I need to subset out each category individually.
-
-ses.low = subset(students, students$ses == "Low")
-ses.med = subset(students, students$ses == "Middle")
-ses.high = subset(students, students$ses == "High")
-
-# Now that I have subsets with the separate categories, I can combine them into
-# sets of two groups at a time. I do this by "binding" the rows of the two
-# categories into one set of data using the rbind() function.
-
-ses.low.med <- rbind(ses.low, ses.med)
-ses.low.high <- rbind(ses.low, ses.high)
-ses.med.high <- rbind(ses.med, ses.high)
-
-# Now I can run t tests for the response variable, reading, as a function of
-# the explanatory variable, SES category.
-
-t_test_low_med <- t.test(ses.low.med$read ~ ses.low.med$ses)
-t_test_low_high <- t.test(ses.low.high$read ~ ses.low.high$ses)
-t_test_med_high <- t.test(ses.med.high$read ~ ses.med.high$ses)
-```
-
-From these data, I estimate, with 95% confidence, that students who come from middle SES families will, on average, score between `r round(abs(t_test_low_med$conf.int[2]),0)` and `r round(abs(t_test_low_med$conf.int[1]),0)` points higher than those from low SES families. I estimate with the same confidence that students who come from high SES families will, on average, score between `r round(abs(t_test_low_high$conf.int[2]),0)` and `r round(abs(t_test_low_high$conf.int[1]),0)` points higher than students from low SES families and between `r round(abs(t_test_med_high$conf.int[2]),0)` and `r round(abs(t_test_med_high$conf.int[1]),0)` points higher than students from middle SES families. Thus, the trend that I see in the sample of increasing reading score means with increasing SES wealth, I can infer to the population as well.
-
-The sample data also includes four ethnic categories: Hispanic, Asian, African American, and white. The relationship of SES to ethnic group is illustrated in Figure 3.
-
-***
-
-*Figure 3. Bar plots with percent of each SES category within ethnic groups.*
-
-```{r echo=FALSE}
-# This constructs a two-way table of frequencies.
-
-ses.race.counts = table(students$ses, students$race)
-
-# This constructs conditional percentages (conditioned on ethnic group) of
-# SES categories.
-
-ses.race.percents = 100*prop.table(ses.race.counts, 2)
-
-# This provides a stacked bar graph.
-
-barplot(ses.race.percents,
-        xlab = "Ethnic Group",
-        ylab = "Percents",
-        legend = c("Low", "Middle", "High"),
-        args.legend = list(title = "SES", cex = .7))
-```
-
-***
-
-Table 2 provides the percentages of each SES within each ethnic group. It is apparent that there is a relationship of SES and ethnicity. A relatively low percentage of whites are in the low SES category, whereas the percentages of non-white ethnic groups in the low SES categories are substantially higher than for whites; in fact, it is three times higher for African Americans.
-
-***
-
-*Table 2. Percent of each SES classification within each of four ethnic groups.*
-
-```{r echo=FALSE}
-# This provides percents. The "round" function eliminates decimal points to
-# make the numbers easier to read and remember.
-
-round(ses.race.percents)
-```
-
-***
-
-```{r include=FALSE}
-# For Confidence intervals to compare the population proportion  of each
-# category of SES for African American students  and white students, we can
-# pull out the counts we need to  create these intervals. Let's first get
-# the total counts for each race.
-
-race.counts <- table(students$race)
-
-# Here is the comparison for low SES. This tells us to compare columns 3 and
-# 4 in the first row, using the totals in columns 3 and 4 as the totals for
-# African-American and White high school students in the sample.
-
-prop.test(ses.race.counts[1,3:4], race.counts[3:4])
-
-# Here's for middle SES.
-
-prop.test(ses.race.counts[2,3:4], race.counts[3:4])
-
-# Here's for high SES
-
-prop.test(ses.race.counts[3,3:4], race.counts[3:4])
-```
-
-From these data we can infer with 95% confidence the percentage of African-American high school students who come from a low SES home is 13 to 64 percentage points higher than the percentage of white high school students who come from low SES homes. The percentage of African-American high school students who come from middle SES homes is anywhere from 4 percentage points higher to 45 percentage points lower than the percentage of white students who come from middle SES homes. Finally, the percentage of African-American high school students who come from high SES homes is somewhere between 2 percentage points higher to 38 percentage points lower than white students who come from high SES homes. Taken collectively, there is strong evidence that white students come from homes of higher wealth in higher proportions than African-American students.
 
 ### Conclusions
 
-I examined whether reading test scores are related to socioeconomic classification. The answer is “yes.” As socioeconomic status increases, the reading test scores also increase. This is true across the range of the reading test score spectrum. For example, the mean for the middle SES students is about 4 points higher than for low SES students. Similarly, the mean for the students in the high SES group is about 4 points higher than for the middle SES group. This upward shift has very little influence on the width of the distribution of scores, so it is an “across the board” shift. When taking into account the sampling variability of our estimates, we can still say with 95% confidence that, as an example, students from high SES backgrounds will score an average between 4 and 12 points higher than students from low SES backgrounds.
+In conclusion, this breif report broke down five standardized tests, revealing students had consistent performance acorss all subjects, with the average score ranging between 50.8 and 54.1 points. The 95% confidence intervals for each tests indicated that the true population mean fell within these ranges, highlighting moderate performance across all subjects. Student's math, writing, and social study scores were higher on average compared to their reading and science socres, but these differences were not substantial. These findings suggests that despite the perforance of each test varies slightly, the average scores between all tests fell within a comparable range.
 
-As a secondary question, I also looked at the relationship of SES to ethnic groups, finding that there is a clear relationship. A substantially higher percentage of white students come from higher SES homes than their Hispanic, Asian, and, most especially, African American counterparts. As an example, the percentage of African American high school seniors from low SES homes is more than three times the percentage of white seniors from low SES homes. Based on these estimates and the margin of error, I expect to see similar trends in the nation as I do in the sample. This relationship may help explain differences in reading scores for various ethnic groups, though that was not the focus of this report and more study will be needed to confirm that this is the case.
-
-### Press Release
-
-Researchers at the University of South Carolina used a national sample of 200 high school seniors to study the relationship of socioeconomic status to reading test scores. “These findings are important,” stated lead analyst Mike Seaman, “because SES widely varies and could be related to school resources and instructional environment.” Seaman said that about half of the seniors are from middle-income homes, with the other half about evenly split between high- and low-income homes. “That’s not a complete picture,” he said, “because the distribution is very different for different ethnic groups. For example, the percentage of African American seniors in low-income homes is over three times the percentage of whites in low-income homes.”
-
-The main findings of the study show that there is indeed a relationship of SES to reading test scores, with test scores increasing as income-level increases. Seaman reports the difference in average reading test scores for seniors from a high SES environment is about 8 points higher than that of seniors from a low SES home.
