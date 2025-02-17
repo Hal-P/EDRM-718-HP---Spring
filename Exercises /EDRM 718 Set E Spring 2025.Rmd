@@ -106,6 +106,10 @@ class(read_sd_2)  # Check class of read_sd_2
 class(read_sd_3)  # Check class of read_sd_3
 ```
 
+
+The differences in the class arise from how each operator interacts with lists in R. For example the single bracket operator [ ] extracts a subset of a list while preserving the list structure. This will result in the read_sd_1 to still be a list containing one element "read". The double bracket [[ ]] will extract the actual value that is stored in the read object and remove it from the list. Since the value is numeric, read_sd_2 becomes a numeric vector. Finally the dollar sign operator $ is a short hand for the double brackets and acts just like it, where it extracts the value directly. This resulted in the read_sd_3 object to also be a numeric vector. 
+
+
 ***
 
 **In an early exercise set you created vectors and a data frame that included the names of some of the members of our class, email addresses, and the distance we each travel to our class meetings. For the exercises below you will use these same data for all students in our class. (At least one member from each of the previous groups will need to share the data for their group. You may use the Research Cafe, or other means if you prefer, to do this.) You will use this combined data set for the following items, though you should just include the current members of our class. The class member profiles is current, so you can use that if you need a reminder of who is currently in the class.**
