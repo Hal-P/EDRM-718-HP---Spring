@@ -112,19 +112,17 @@ private_mean_2
 
 ```{r include=FALSE}
 # Check if the class and type of public_mean is the same as that of public_mean_2
-class_public_mean <- (class(public_mean) == class(public_mean_2))  # Boolean comparison of class
+class(public_mean) == class(public_mean_2)  # Boolean comparison of class
 class_public_mean # TRUE they are the same class
 
-type_public_mean <- (typeof(public_mean) == typeof(public_mean_2))  # Boolean comparison of type
+typeof(public_mean) == typeof(public_mean_2) # Boolean comparison of type
 type_public_mean # TRUE they are the same type
 
 # Check if the class of public_mean is the same as its type
-class_type <- (class(public_mean) == typeof(public_mean))
-class_type # FALSE it is NOT the same type 
+class(public_mean) == typeof(public_mean) # FALSE it is NOT the same type 
 
 # Check if public_mean and public_mean_2 contain the same information
-identical_public_mean <- identical(public_mean, public_mean_2)
-identical_public_mean # TRUE they both have the same information
+identical(public_mean, public_mean_2) # TRUE they both have the same information
 ```
 
 ***
@@ -161,6 +159,7 @@ rownames(private_stats) <- c("Mean", "SD")
 # Display the matrices
 public_stats
 private_stats
+class(private_stats)
 ```
 
 
