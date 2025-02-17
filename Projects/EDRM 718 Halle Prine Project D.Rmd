@@ -1,0 +1,384 @@
+---
+title: "Project D - The Relationship of SES and Reading Scores of High School Seniors"
+author: "Halle Prine"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r include=FALSE}
+
+# The "here" library will let me read the data from an individual folder.
+library(here)
+
+# I read the data and put it in an object called "students".
+
+students <- read.csv(here("Data", "hsb2.csv"), header = TRUE, sep = ",")
+
+# Select only the five standardized test score columns 
+test_scores <- students[, c("read", "write", "math", "science", "socst")]
+
+# Creating a data frame that has the test scores:
+test_summary <- data.frame(
+  Test = colnames(test_scores),
+  Min = apply(test_scores, 2, min, na.rm = TRUE),
+  Q1 = apply(test_scores, 2, function(x) quantile(x, 0.25, na.rm = TRUE)),
+  Median = apply(test_scores, 2, median, na.rm = TRUE),
+  Q3 = apply(test_scores, 2, function(x) quantile(x, 0.75, na.rm = TRUE)),
+  Max = apply(test_scores, 2, max, na.rm = TRUE),
+  Mean = round(colMeans(test_scores, na.rm = TRUE), 1),
+  SD = round(apply(test_scores, 2, sd, na.rm = TRUE), 1)
+)
+```
+
+### Description
+
+This brief report will examine the test score from five standardized tests given across high school seniors. The first aim is to provide descriptive statistics of each test and the second aim is to evaluate these statistics from each test.
+
+*Source of data: The "HSB2 data set" provided by Dr. Micheal Seaman.*
+
+### Analysis
+
+In this data set, the standardized tests are divided into 5 subjects: reading, writing, science, math and science. For the purpose of this report we will first examine each standardize test using a five-number summary, mean and the standard deviation. Then we will compare each test to one another and report each mean and standard deviations, as well as the 95% confidence intervals for the means in the larger population. 
+
+Figure 1 illustrates the distribution of standardized reading test scores. The median reading score is approximately 75, which suggests that the middle student scored around this value. The box extends from 65 (Q1) to 85 (Q3), indicating that 50% of the students scores lie within this range. The whiskers extend from 55 to 95, showing that the lowest and highest scores within the normal range (1.5*IQR from the quadrilles) are between these values. Table 1 summarizes the math score's five-number descriptive statistics. 
+
+
+```{r include=FALSE}
+
+Read_table <- round(rbind(
+  Read = c(
+    Mean = mean(test_scores$read, na.rm = TRUE),
+    SD = sd(test_scores$read, na.rm = TRUE),
+    Min = min(test_scores$read, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$read, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$read, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$read, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$read, na.rm = TRUE)
+  )
+), 1)  # Rounding to 1 decimal place
+
+Read_table
+
+```
+
+
+*Figure 1. Box plot for Standardized Reading Test Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("read")], 
+        main = "Distribution of Reading Test Scores", 
+        ylab = "Scores", 
+        col = c("lightblue"))
+
+```
+
+
+*Table 1. Statistics for each of the reading standardized test.*
+
+```{r echo=FALSE}
+
+Read_table <- round(rbind(
+  Read = c(
+    Mean = mean(test_scores$read, na.rm = TRUE),
+    SD = sd(test_scores$read, na.rm = TRUE),
+    Min = min(test_scores$read, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$read, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$read, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$read, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$read, na.rm = TRUE)
+  )
+), 1)  # Rounding to 1 decimal place
+
+Read_table
+
+```
+
+
+Figure 2 illustrates the distribution of standardized writing test scores. The median writing score is around 70 indicating that half of the students scored below this and half above. The interquartile range is from 60 to 80, with most of the students scoring within this range. Examining the whiskers on the right are slightly longer than those on the left. This indicates a slight postive (right) skew in the data. This suggests that only a fe students scored much higher than the majority. Table 2 summarizes these descriptive statsitics. 
+
+
+
+```{r include=FALSE}
+
+# Write Table
+Write_table <- round(rbind(
+  Write = c(
+    Mean = mean(test_scores$write, na.rm = TRUE),
+    SD = sd(test_scores$write, na.rm = TRUE),
+    Min = min(test_scores$write, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$write, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$write, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$write, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$write, na.rm = TRUE)
+  )
+), 1)
+
+Write_table
+
+```
+
+
+
+*Figure 2. Box plot for Standardized Writing Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("write")], 
+        main = "Distribution of Writing Test Scores", 
+        ylab = "Scores", 
+        col = c("lightgreen"))
+
+```
+
+
+*Table 2. Statistics for each of the reading standardized test.*
+
+```{r echo=FALSE}
+
+# Write Table
+Write_table <- round(rbind(
+  Write = c(
+    Mean = mean(test_scores$write, na.rm = TRUE),
+    SD = sd(test_scores$write, na.rm = TRUE),
+    Min = min(test_scores$write, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$write, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$write, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$write, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$write, na.rm = TRUE)
+  )
+), 1)
+
+Write_table
+
+```
+
+Figure 3 illustrates the distribution of standardized math test scores. The median math score is around 78 indicating that most students are concentrated around this score. The interquartile range is from 70 to 90, showing that most students scored between these values. The whiskers extend from 60 to 95, indicating the range of the scores that are not considered outliers. Table 3 summarizes these descriptive statsitics. 
+
+
+```{r include=FALSE}
+
+# Math Table
+Math_table <- round(rbind(
+  Math = c(
+    Mean = mean(test_scores$math, na.rm = TRUE),
+    SD = sd(test_scores$math, na.rm = TRUE),
+    Min = min(test_scores$math, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$math, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$math, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$math, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$math, na.rm = TRUE)
+  )
+), 1)
+
+Math_table
+
+```
+
+
+*Figure 3. Boxplot for Standardized Math Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("math")], 
+        main = "Distribution of Writing Test Scores", 
+        ylab = "Scores", 
+        col = c("lightpink"))
+
+```
+
+
+
+*Table 3. Statistics for Standardized Math Scores.*
+
+```{r echo=FALSE}
+
+# Math Table
+Math_table <- round(rbind(
+  Math = c(
+    Mean = mean(test_scores$math, na.rm = TRUE),
+    SD = sd(test_scores$math, na.rm = TRUE),
+    Min = min(test_scores$math, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$math, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$math, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$math, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$math, na.rm = TRUE)
+  )
+), 1)
+
+Math_table
+
+```
+
+
+Next we will evaluate the standarized science test scores. Figure 3 demonstrates the distribution of standardized science test scores. The median science score is around 80, this suggests that this is the median score received. The IQR is from 70 to 90, meaning that half of the students scored between 70 and 90. The boxplot appears to be fairly symetric and there are no significnat outliers in the science scores. Table 3 summarizes these descriptive statsitics. 
+
+
+
+```{r include=FALSE}
+
+# Science Table
+Science_table <- round(rbind(
+  Science = c(
+    Mean = mean(test_scores$science, na.rm = TRUE),
+    SD = sd(test_scores$science, na.rm = TRUE),
+    Min = min(test_scores$science, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$science, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$science, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$science, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$science, na.rm = TRUE)
+  )
+), 1)
+
+Science_table
+
+```
+
+
+*Figure 3. Boxplot for Standardized Science Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("science")], 
+        main = "Distribution of Scicene Test Scores", 
+        ylab = "Scores", 
+        col = c("lightyellow"))
+
+```
+
+*Table 3. Statistics for Standardized Science Scores.*
+
+```{r echo=FALSE}
+
+# Science Table
+Science_table <- round(rbind(
+  Science = c(
+    Mean = mean(test_scores$science, na.rm = TRUE),
+    SD = sd(test_scores$science, na.rm = TRUE),
+    Min = min(test_scores$science, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$science, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$science, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$science, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$science, na.rm = TRUE)
+  )
+), 1)
+
+Science_table
+
+```
+
+
+Finally the last standardize test we will be evaluating independently is student's social studies test scores. Figure 4 depicts the distribution of standardized social studies  test scores. The mediam social studies score in around 72 and the IQR is between 62 and 82, indicating that most student's scores fell between these two values. Table 4 ummarizes the five-number descriptive statsitics of this standardize test. 
+
+
+```{r include=FALSE}
+
+# Social Studies Table
+Socst_table <- round(rbind(
+  Socst = c(
+    Mean = mean(test_scores$socst, na.rm = TRUE),
+    SD = sd(test_scores$socst, na.rm = TRUE),
+    Min = min(test_scores$socst, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$socst, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$socst, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$socst, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$socst, na.rm = TRUE)
+  )
+), 1)
+
+Socst_table
+
+```
+
+
+*Figure 4. Boxplot for Standardized Social Studies Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("socst")], 
+        main = "Distribution of Social Studies Test Scores", 
+        ylab = "Scores", 
+        col = c("lightgray"))
+
+```
+
+*Table 4. Statistics for Standardized Social Studies Scores.*
+
+```{r echo=FALSE}
+
+# Social Studies Table
+Socst_table <- round(rbind(
+  Socst = c(
+    Mean = mean(test_scores$socst, na.rm = TRUE),
+    SD = sd(test_scores$socst, na.rm = TRUE),
+    Min = min(test_scores$socst, na.rm = TRUE),
+    Q1 = as.numeric(quantile(test_scores$socst, 0.25, na.rm = TRUE)),
+    Median = median(test_scores$socst, na.rm = TRUE),
+    Q3 = as.numeric(quantile(test_scores$socst, 0.75, na.rm = TRUE)),
+    Max = max(test_scores$socst, na.rm = TRUE)
+  )
+), 1)
+
+Socst_table
+
+```
+
+
+Finally, we compared each standardize test to one another to reveal the distributions of test scores across the students. Figure 5 is a side by side boxplot that reveals these key differences in test scores. We find that science and math have the highest medians (80 and 78), indicating students had a strong performance with greater variability, seen by their wide IQRs. Student's writing scores had the lowest median (70) and a more consistent spread, but it is slightly skewed. Social studies had a median of 72, with a narrower IQR and high outliers. Reading shows symmetry, however, it includes a high outlier. Additionally, we calcuated each test's 95% confidence interval which is summarized in table 5. 
+
+***
+*Figure 5. Side by Side Boxplots Across the Standardized Test Scores.*
+
+```{r echo=FALSE}
+# Boxplot for test scores
+boxplot(students[, c("read", "write", "math", "science", "socst")], 
+        main = "Distribution of Test Scores", 
+        ylab = "Scores", 
+        col = c("lightblue", "lightgreen", "lightpink", "lightyellow", "lightgray"))
+
+```
+
+
+*Table 6. Table of 95% Confidence Intervals for each Standardized Test.*
+
+```{r echo=FALSE}
+
+# Calculate 95% CI using t.test for each test score
+Read_CI <- t.test(test_scores$read)$conf.int
+Write_CI <- t.test(test_scores$write)$conf.int
+Math_CI <- t.test(test_scores$math)$conf.int
+Science_CI <- t.test(test_scores$science)$conf.int
+Socst_CI <- t.test(test_scores$socst)$conf.int
+
+# Combine results into a table
+CI_table <- round(rbind(Read_CI, Write_CI, Math_CI, Science_CI, Socst_CI), 2)
+colnames(CI_table) <- c("Lower_CI", "Upper_CI")
+rownames(CI_table) <- c("Read", "Write", "Math", "Science", "Socst")
+
+# Print the table
+print(CI_table)
+
+
+```
+Based on the 95% confidence intervals for each of the test scores we can make the following estimates about the larger population:
+
+Regarding the standardized reading test scores we estimate with a 95% confidence that the average score in the student population will fall between
+`r round(Read_CI[1], 1)` and `r round(Read_CI[2], 1)` points. This suggests that the average performance on the reading test is relatively low, with a narrow range of possible scores. 
+
+Similarly, for writing, the 95% confidence interval for the mean is between `r round(Write_CI[1], 1)` and `r round(Write_CI[2], 1)` points. This indicates that the writing test scores are somewhat higher than the reading, with a slightly wider range, indicating theres a small degree of variability as well within the student;s performance.
+
+The student's math test scores had a 95% confidence interval for a mean score is between `r round(Math_CI[1], 1)` and `r round(Math_CI[2], 1)` points. Like their writing and math test scores we see similar trends of a moderate performance. 
+
+In science, the 95% confidence interval for the mean score falls between `r round(Science_CI[1], 1)` and `r round(Science_CI[2], 1)` points. The science test scores seem to be consistent with the reading scores, with a slightly lower average.
+
+Finally, for social studies, the 95% confidence interval for the mean score is between `r round(Socst_CI[1], 1)` and `r round(Socst_CI[2], 1)` points. This suggests that social studies scores was in line with the other subjects, with the true population mean likely falling within this interval. 
+
+
+
+
+### Conclusions
+
+In conclusion, this breif report broke down five standardized tests, revealing students had consistent performance acorss all subjects, with the average score ranging between 50.8 and 54.1 points. The 95% confidence intervals for each tests indicated that the true population mean fell within these ranges, highlighting moderate performance across all subjects. Student's math, writing, and social study scores were higher on average compared to their reading and science socres, but these differences were not substantial. These findings suggests that despite the perforance of each test varies slightly, the average scores between all tests fell within a comparable range.
+
