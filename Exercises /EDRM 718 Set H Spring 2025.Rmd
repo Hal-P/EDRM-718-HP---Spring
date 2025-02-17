@@ -1,0 +1,50 @@
+---
+title: "EDRM 718 Exercise Set H"
+output:
+  html_document:
+    df_print: paged
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+**1. Create a data frame named *our_class* that includes these variables, in order: *first_name*, *last_name*, *email*, *distance*. (Note: You did this for one item of a previous exercise set, so you may want to simply copy your code chunk from that item.)**
+
+***
+
+**2. Prepare to conduct a small study by using the *sample()* function to randomly select six members of the class. Store just the participants names and email addresses in a *participants* data frame. (Yes, you can be picked as a participant of your own study.)**
+
+***
+
+**3. Randomly select three of the participants to be in the treatment condition. Add a *condition* variable to the participants data frame to indicate *control* or *treatment* for each participant. (Hint: The sample function chose participants in random order.)**
+
+***
+
+**4. Use the *here()* function and the *write.csv()* function to write the *participants* data frame to a CSV file, *participants.csv*, in your project *data* folder. Include the variable names as a header row in your file, but do not include row numbers.**
+
+***
+
+**5. Construct a vector *my_numbers* that consists of nine randomly chosen integers between 1 and 100 (inclusive).**
+
+***
+
+**6. Increase the length of *my_numbers* to 11 by putting two missing value indicators at randomly chosen locations in the vector. (Hint: It is OK to randomly reorder the numbers already in the vector.)**
+
+***
+
+**7. Increase the length of *my_numbers* to 12 by putting an infinity indicator at a randomly chosen location in the vector. (Hint: It is still OK to randomly reorder the values already in the vector.)**
+
+***
+
+**8. Use *my numbers* to illustrate what happens for every possible value of the two optional arguments of the *range()* function.**
+
+***
+
+**9. The documentation for the *range()* function states that this function can be used for character objects. Demonstrate this with the *first_name* variable in *our_class*. Based on the result, briefly explain what the function does with a character vector.**
+
+***
+
+**10. The documentation for the *range()* function indicates the first argument, the only required argument, as ellipses. What does this mean and why is that the case for this function?**
+
+***
