@@ -1,0 +1,26 @@
+---
+title: "EDRM 718 Exercise Set G"
+output:
+  html_document:
+    df_print: paged
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Twelve points per item)*
+
+***
+
+**1. Write a script that (a) loads the Mount Juniper Elementary data into a data frame, (b) checks the score column to determine if there are missing data, and (c) prints either there are no missing data or there are missing data, depending on which of these is true.**
+
+***
+
+**2. Consider a population of normally distributed scores with a mean of 100 and a standard deviation of 15. Write a script to draw 1,000 random samples, each of size 40, from this population. Calculate and store each mean in a vector of means. Compare the mean and standard deviation of the population with the mean and standard deviation of the vector of means. What statistical characteristics of the mean do these comparisons illustrate? (Hint: You will need to initialize a vector object by assigning it *NULL* prior to using it in a loop.)**
+
+***
+
+**3. Write a script that will count in your console pane from 0, in increments of 10, up through 1,000. Do three different versions of the script: (a) with a for loop, (b) with a while loop, and (c) with a repeat and break structure.**
+
+***
+
+**4. The Secret Code file contains a hidden message. Use nested for loops to reveal the message by pasting together the characters in every 8th position (i.e., positions 8, 16, 24, and 32) on all 23 rows. (Hint: The *paste* function should come in handy.)**
+
+***
