@@ -1,5 +1,6 @@
 ---
 title: "EDRM 718 Exercise Set G"
+Author: "Halle Prine"
 output:
   html_document:
     df_print: paged
@@ -7,20 +8,110 @@ output:
 
 *Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Twelve points per item)*
 
+```{r include=FALSE}
+# The "here" library will let me read the data from an individual folder.
+library(here)
+
+# I read the data and put it in an object called "legislators".
+
+secret <- read.csv(here("Data", "Secret Code.CSV"), header = FALSE, sep = ",") # Read the file
+```
+
 ***
 
 **1. Write a script that (a) loads the Mount Juniper Elementary data into a data frame, (b) checks the score column to determine if there are missing data, and (c) prints either there are no missing data or there are missing data, depending on which of these is true.**
+
+```{r include=FALSE}
+
+elm.mj <- read.csv(here("Data", "Mount Juniper Elementary Data.csv"), header = TRUE, sep = ",")
+
+missing_scores <- sum(is.na(elm.mj$Score))
+
+if (missing_scores == 0) {
+  print("There are no missing data in the score column.")
+} else {
+  print(paste("There are", missing_scores, "missing data points in the score column."))
+}
+```
 
 ***
 
 **2. Consider a population of normally distributed scores with a mean of 100 and a standard deviation of 15. Write a script to draw 1,000 random samples, each of size 40, from this population. Calculate and store each mean in a vector of means. Compare the mean and standard deviation of the population with the mean and standard deviation of the vector of means. What statistical characteristics of the mean do these comparisons illustrate? (Hint: You will need to initialize a vector object by assigning it *NULL* prior to using it in a loop.)**
 
+```{r include=FALSE}
+
+set.seed(123)  # For reproducibility
+population_mean <- 100
+population_sd <- 15
+sample_size <- 40
+num_samples <- 1000
+
+means_vector <- NULL
+for (i in 1:num_samples) {
+  sample_data <- rnorm(sample_size, mean = population_mean, sd = population_sd)
+  means_vector <- c(means_vector, mean(sample_data))
+}
+
+# (e) Compare population parameters with sample means
+cat("Population Mean:", population_mean, "\n")
+cat("Population Standard Deviation:", population_sd, "\n")
+cat("Mean of Sample Means:", mean(means_vector), "\n")
+cat("Standard Deviation of Sample Means:", sd(means_vector), "\n")
+
+```
+
 ***
 
 **3. Write a script that will count in your console pane from 0, in increments of 10, up through 1,000. Do three different versions of the script: (a) with a for loop, (b) with a while loop, and (c) with a repeat and break structure.**
 
+```{r include=FALSE}
+
+# Using a for loop
+cat("Counting with for loop:\n")
+for (i in seq(0, 1000, by = 10)) {
+  print(i)
+}
+
+# Using a while loop
+cat("Counting with while loop:\n")
+i <- 0
+while (i <= 1000) {
+  print(i)
+  i <- i + 10
+}
+
+# Using a repeat loop with break
+cat("Counting with repeat loop:\n")
+i <- 0
+repeat {
+  print(i)
+  if (i >= 1000) break
+  i <- i + 10
+}
+
+```
+
 ***
 
 **4. The Secret Code file contains a hidden message. Use nested for loops to reveal the message by pasting together the characters in every 8th position (i.e., positions 8, 16, 24, and 32) on all 23 rows. (Hint: The *paste* function should come in handy.)**
+
+```{r include=FALSE}
+
+# Initialize an empty string to hold the message
+message <- ""
+
+# Loop through each row and extract characters at positions 8, 16, 24, and 32
+for (i in 1:nrow(secret)) {  # Loop through each row
+  for (j in c(8, 16, 24, 32)) {  # Loop through positions 8, 16, 24, 32
+    # Append the character at the j-th position of the i-th row to the message
+    message <- paste(message, secret[i, j], sep="")
+  }
+}
+
+# Print the hidden message
+cat("The hidden message is:", message)
+
+```
+
 
 ***
