@@ -1,5 +1,6 @@
 ---
 title: "EDRM 718 Exercise Set H"
+Author: "Halle Prine"
 output:
   html_document:
     df_print: paged
@@ -11,40 +12,176 @@ output:
 
 **1. Create a data frame named *our_class* that includes these variables, in order: *first_name*, *last_name*, *email*, *distance*. (Note: You did this for one item of a previous exercise set, so you may want to simply copy your code chunk from that item.)**
 
+```{r include=FALSE}
+# Create vectors for each variable
+first_name <- c("Adam", "Aishwanya", "Alison", "Beatrice", "Benny", "Brandi", 
+                "Emily", "Gitanjali", "Halle", "Irene", "Jongwon", "Julia", 
+                "Kaitlyn", "Kartik", "Matt", "Nestor", "Regin", "Saeed", 
+                "Samin", "Sayema", "Suprja", "Unum")
+
+last_name <- c("Brown", "Khemkar", "Scheide", "Quiroz", "Thomswarzecha",
+               "Byers", "Lorbach", "Lall", "Prine", "Esu", "Lee", "Barnes",
+               "Ramey", "Midha", "Marquiez auza","Urrea romero", "Dean", 
+               "Ahmadi", "Ashjael", "Akter", "Arikumar", "Aslam")
+
+email <- c("Adam.brown@moore.sc.edu", "akhemkar@email.sc.edu", 
+           "scheidea@mailbox.sc.edu", "bnquiroz@email.sc.edu",
+           "thomswab@email.sc.edu", "byersb@mailbox.sc.edu",
+           "lohrbach@email.sc.edu", "glall@email.sc.edu",
+           "hprine@email.sc.edu", "iesu@email.sc.edu",
+           "lee1125@sc.edu", "jab30@mailbox.sc.edu",
+           "ktramey@email.sc.edu", "kmidha@email.sc.edu",
+           "mateom@email.sc.edu", "nfu@email.sc.edu",
+           "regin@email.sc.edu", "ahmadis@email.sc.edu",
+           "sashjaei@email.sc.edu", "sakter@email.sc.edu",
+           "Srikumar@email.sc.edu", "uaslam@email.sc.edu")
+
+distance <- c(12, 1, 5, 5, 2, 19, 1, 1, 7, 1, 19, 2, 5, 3, 1, 2, 2, 0, 1, 1, 1,
+              2)
+
+# Combined vectors into a data frame
+our_class <- data.frame(first_name, last_name, email, distance)
+
+View(our_class)
+colnames(our_class)
+```
+
+
 ***
 
 **2. Prepare to conduct a small study by using the *sample()* function to randomly select six members of the class. Store just the participants names and email addresses in a *participants* data frame. (Yes, you can be picked as a participant of your own study.)**
+
+```{r include=FALSE}
+# Set a random seed for reproducibility
+set.seed(123)
+
+# Randomly select 6 rows from the our_class data frame
+selected_indices <- sample(1:nrow(our_class), 6)
+
+# Create a new data frame with the selected participants' names and email addresses
+participants <- our_class[selected_indices, c("first_name", "last_name", "email")]
+
+participants
+
+```
 
 ***
 
 **3. Randomly select three of the participants to be in the treatment condition. Add a *condition* variable to the participants data frame to indicate *control* or *treatment* for each participant. (Hint: The sample function chose participants in random order.)**
 
+```{r include=FALSE}
+# Randomly assign 3 participants to the treatment condition
+treatment_indices <- sample(1:nrow(participants), 3)
+
+# Create a new 'condition' column with default value "control"
+participants$condition <- "control"
+
+# Assign "treatment" to the selected participants
+participants$treatment <- ifelse(1:nrow(participants) %in% treatment_indices, "treatment", "control")
+
+# View the updated participants data frame
+View(participants)
+
+```
+
+
 ***
 
 **4. Use the *here()* function and the *write.csv()* function to write the *participants* data frame to a CSV file, *participants.csv*, in your project *data* folder. Include the variable names as a header row in your file, but do not include row numbers.**
+
+```{r include=FALSE}
+write.csv(participants, file = here("data", "participants.csv"), row.names = FALSE)
+```
+
 
 ***
 
 **5. Construct a vector *my_numbers* that consists of nine randomly chosen integers between 1 and 100 (inclusive).**
 
+```{r include=FALSE}
+# Set a random seed for reproducibility (optional)
+set.seed(123)
+
+# Generate the vector of nine random integers between 1 and 100
+my_numbers <- sample(1:100, 9, replace = TRUE)
+
+my_numbers
+
+```
+
+
 ***
 
 **6. Increase the length of *my_numbers* to 11 by putting two missing value indicators at randomly chosen locations in the vector. (Hint: It is OK to randomly reorder the numbers already in the vector.)**
+
+```{r include=FALSE}
+# Set a random seed for reproducibility (optional)
+set.seed(123)
+
+# Add two NA values to the original vector
+my_numbers_with_na <- c(my_numbers, NA, NA, 11)
+
+# Randomly reorder the vector to place the NAs at random positions
+my_numbers_with_na <- sample(my_numbers_with_na)
+
+my_numbers_with_na
+```
 
 ***
 
 **7. Increase the length of *my_numbers* to 12 by putting an infinity indicator at a randomly chosen location in the vector. (Hint: It is still OK to randomly reorder the values already in the vector.)**
 
+```{r include=FALSE}
+
+# Set a random seed for reproducibility (optional)
+set.seed(123)
+
+# Add an Inf value to the vector
+my_numbers_with_inf <- c(my_numbers_with_na, Inf, After = 11)
+
+# Randomly reorder the vector to place the Inf value at a random position
+my_numbers_with_inf <- sample(my_numbers_with_inf)
+
+my_numbers_with_inf
+
+```
+
 ***
 
 **8. Use *my numbers* to illustrate what happens for every possible value of the two optional arguments of the *range()* function.**
+
+```{r include=FALSE}
+
+# Illustrate range behavior for every possible combination of 'na.rm' and 'finite'
+range(my_numbers_with_inf)               # Default: na.rm = FALSE, finite = FALSE
+range(my_numbers_with_inf, na.rm = TRUE)  # na.rm = TRUE, finite = FALSE
+range(my_numbers_with_inf, finite = TRUE) # na.rm = FALSE, finite = TRUE
+range(my_numbers_with_inf, na.rm = TRUE, finite = TRUE) # na.rm = TRUE, finite = TRUE
+
+```
 
 ***
 
 **9. The documentation for the *range()* function states that this function can be used for character objects. Demonstrate this with the *first_name* variable in *our_class*. Based on the result, briefly explain what the function does with a character vector.**
 
+```{r include=FALSE}
+# Use range() on the first_name variable from the our_class data frame
+range(our_class$first_name)
+
+```
+This looked our names as numerically but using this function made it go into alphabetical order, treating it as a character.
 ***
 
 **10. The documentation for the *range()* function indicates the first argument, the only required argument, as ellipses. What does this mean and why is that the case for this function?**
+
+The ellipsies in the documentation for the range() function indicated that the function can accept any number of arguments, beyond the required first argument. This means that you can pass multiple arguments to the range() function and it will compute the range over all of them. 
+
+The ellipises is a pass through and deciding where things should go, "when you give me an object I'll look at the class and organize it by it's class (numerical)
+
+Passing though the data through other functions. 
+
+```{r include=FALSE}
+
+```
 
 ***
