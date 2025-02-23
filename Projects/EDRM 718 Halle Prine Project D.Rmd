@@ -42,7 +42,7 @@ This brief report will examine the test score from five standardized tests given
 
 In this data set, the standardized tests are divided into 5 subjects: reading, writing, science, math and science. For the purpose of this report we will first examine each standardize test using a five-number summary, mean and the standard deviation. Then we will compare each test to one another and report each mean and standard deviations, as well as the 95% confidence intervals for the means in the larger population. 
 
-Figure 1 illustrates the distribution of standardized reading test scores. The median reading score is approximately 75, which suggests that the middle student scored around this value. The box extends from 65 (Q1) to 85 (Q3), indicating that 50% of the students scores lie within this range. The whiskers extend from 55 to 95, showing that the lowest and highest scores within the normal range (1.5*IQR from the quadrilles) are between these values. Table 1 summarizes the math score's five-number descriptive statistics. 
+Figure 1 illustrates the distribution of standardized reading test scores. The median reading score is approximately `r round(median(test_scores$read, na.rm = TRUE), 1)`, which suggests that the middle student scored around this value. The box extends from `r round(quantile(test_scores$read, 0.25, na.rm = TRUE), 1)` (Q1) to `r round(quantile(test_scores$read, 0.75, na.rm = TRUE), 1)` (Q3), indicating that 50% of the students scores lie within this range. The whiskers extend from `r round(min(test_scores$read, na.rm = TRUE), 1)` to `r round(max(test_scores$read, na.rm = TRUE), 1)`, showing that the lowest and highest scores within the normal range (1.5*IQR from the quadrilles) are between these values. Table 1 summarizes the math score's five-number descriptive statistics. 
 
 
 ```{r include=FALSE}
@@ -97,7 +97,7 @@ Read_table
 ```
 
 
-Figure 2 illustrates the distribution of standardized writing test scores. The median writing score is around 70 indicating that half of the students scored below this and half above. The interquartile range is from 60 to 80, with most of the students scoring within this range. Examining the whiskers on the right are slightly longer than those on the left. This indicates a slight postive (right) skew in the data. This suggests that only a fe students scored much higher than the majority. Table 2 summarizes these descriptive statsitics. 
+Figure 2 illustrates the distribution of standardized writing test scores. The median writing score is around `r round(median(test_scores$write, na.rm = TRUE), 1)` indicating that half of the students scored below this and half above. The interquartile range is from `r round(quantile(test_scores$write, 0.25, na.rm = TRUE), 1)` (Q1) to `r round(quantile(test_scores$write, 0.75, na.rm = TRUE), 1)` (Q3), with most of the students scoring within this range. Examining the whiskers on the right are slightly longer than those on the left. This indicates a slight positive (right) skew in the data. This suggests that only a few students scored much higher than the majority. Table 2 summarizes these descriptive statistics. 
 
 
 
@@ -155,7 +155,7 @@ Write_table
 
 ```
 
-Figure 3 illustrates the distribution of standardized math test scores. The median math score is around 78 indicating that most students are concentrated around this score. The interquartile range is from 70 to 90, showing that most students scored between these values. The whiskers extend from 60 to 95, indicating the range of the scores that are not considered outliers. Table 3 summarizes these descriptive statsitics. 
+Figure 3 illustrates the distribution of standardized math test scores. The median math score is around `r round(median(test_scores$math, na.rm = TRUE), 1)`, indicating that most students are concentrated around this score. The interquartile range is from `r round(quantile(test_scores$math, 0.25, na.rm = TRUE), 1)` (Q1) to `r round(quantile(test_scores$math, 0.75, na.rm = TRUE), 1)` (Q3), showing that most students scored between these values. The whiskers extend from `r round(min(test_scores$math, na.rm = TRUE), 1)` to `r round(max(test_scores$math, na.rm = TRUE), 1)`, indicating the range of the scores that are not considered outliers. Table 3 summarizes these descriptive statistics. 
 
 
 ```{r include=FALSE}
@@ -213,7 +213,7 @@ Math_table
 ```
 
 
-Next we will evaluate the standarized science test scores. Figure 3 demonstrates the distribution of standardized science test scores. The median science score is around 80, this suggests that this is the median score received. The IQR is from 70 to 90, meaning that half of the students scored between 70 and 90. The boxplot appears to be fairly symetric and there are no significnat outliers in the science scores. Table 3 summarizes these descriptive statsitics. 
+Next we will evaluate the standardized science test scores. Figure 3 demonstrates the distribution of standardized science test scores. The median science score is around `r round(median(test_scores$science, na.rm = TRUE), 1)`, this suggests that this is the median score received. The IQR is from `r round(quantile(test_scores$science, 0.25, na.rm = TRUE), 1)` (Q1) to `r round(quantile(test_scores$science, 0.75, na.rm = TRUE), 1)`(Q3), meaning that half of the students scored between those values. The box plot appears to be fairly symmetric and there are no significant outliers in the science scores. Table 3 summarizes these descriptive statistics. 
 
 
 
@@ -270,7 +270,7 @@ Science_table
 ```
 
 
-Finally the last standardize test we will be evaluating independently is student's social studies test scores. Figure 4 depicts the distribution of standardized social studies  test scores. The mediam social studies score in around 72 and the IQR is between 62 and 82, indicating that most student's scores fell between these two values. Table 4 ummarizes the five-number descriptive statsitics of this standardize test. 
+Finally the last standardize test we will be evaluating independently is student's social studies test scores. Figure 4 depicts the distribution of standardized social studies  test scores. The median social studies score in around `r round(median(test_scores$socst, na.rm = TRUE), 1)`, and the IQR is between `r round(quantile(test_scores$socst, 0.25, na.rm = TRUE), 1)` (Q1) and `r round(quantile(test_scores$socst, 0.75, na.rm = TRUE), 1)` (Q3), indicating that most student's scores fell between these two values. Table 4 summarizes the five-number descriptive statistics of this standardize test. 
 
 
 ```{r include=FALSE}
@@ -326,7 +326,7 @@ Socst_table
 ```
 
 
-Finally, we compared each standardize test to one another to reveal the distributions of test scores across the students. Figure 5 is a side by side boxplot that reveals these key differences in test scores. We find that science and math have the highest medians (80 and 78), indicating students had a strong performance with greater variability, seen by their wide IQRs. Student's writing scores had the lowest median (70) and a more consistent spread, but it is slightly skewed. Social studies had a median of 72, with a narrower IQR and high outliers. Reading shows symmetry, however, it includes a high outlier. Additionally, we calcuated each test's 95% confidence interval which is summarized in table 5. 
+Finally, we compared each standardize test to one another to reveal the distributions of test scores across the students. Figure 5 is a side by side boxplot that reveals these key differences in test scores. We find that science and math have the highest medians, `r round(median(test_scores$science, na.rm = TRUE), 1)` and `r round(median(test_scores$math, na.rm = TRUE), 1)`, respectively, indicating students had a strong performance with greater variability, seen by their wide IQRs. Student's writing scores had the lowest median `r round(median(test_scores$write, na.rm = TRUE), 1)` and a more consistent spread, but it is slightly skewed. Social studies had a median of `r round(median(test_scores$socst, na.rm = TRUE), 1)`, with a narrower IQR and high outliers. Reading shows symmetry, with a median of `r round(median(test_scores$read, na.rm = TRUE), 1)`, but it includes a high outlier. Additionally, we calculated each test's 95% confidence interval which is summarized in table 5. 
 
 ***
 *Figure 5. Side by Side Boxplots Across the Standardized Test Scores.*
@@ -380,5 +380,5 @@ Finally, for social studies, the 95% confidence interval for the mean score is b
 
 ### Conclusions
 
-In conclusion, this breif report broke down five standardized tests, revealing students had consistent performance acorss all subjects, with the average score ranging between 50.8 and 54.1 points. The 95% confidence intervals for each tests indicated that the true population mean fell within these ranges, highlighting moderate performance across all subjects. Student's math, writing, and social study scores were higher on average compared to their reading and science socres, but these differences were not substantial. These findings suggests that despite the perforance of each test varies slightly, the average scores between all tests fell within a comparable range.
+In conclusion, this brief report broke down five standardized tests, revealing students had consistent performance across all subjects, with the average score ranging between `r round(min(colMeans(test_scores, na.rm = TRUE)), 1)` and `r round(max(colMeans(test_scores, na.rm = TRUE)), 1)`  points. The 95% confidence intervals for each tests indicated that the true population mean fell within these ranges, highlighting moderate performance across all subjects. Student's median math (`r round(mean(test_scores$math, na.rm = TRUE), 1)`), writing (`r round(mean(test_scores$write, na.rm = TRUE), 1)`), and social study (`r round(mean(test_scores$socst, na.rm = TRUE), 1)`) scores were higher on average compared to their reading (`r round(mean(test_scores$read, na.rm = TRUE), 1)`) and science scores (`r round(mean(test_scores$science, na.rm = TRUE), 1)`), but these differences were not substantial. These findings suggests that despite the performance of each test varies slightly, the average scores between all tests fell within a comparable range.
 

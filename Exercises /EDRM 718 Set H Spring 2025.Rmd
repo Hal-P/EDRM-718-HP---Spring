@@ -174,14 +174,6 @@ This looked our names as numerically but using this function made it go into alp
 
 **10. The documentation for the *range()* function indicates the first argument, the only required argument, as ellipses. What does this mean and why is that the case for this function?**
 
-The ellipsies in the documentation for the range() function indicated that the function can accept any number of arguments, beyond the required first argument. This means that you can pass multiple arguments to the range() function and it will compute the range over all of them. 
-
-The ellipises is a pass through and deciding where things should go, "when you give me an object I'll look at the class and organize it by it's class (numerical)
-
-Passing though the data through other functions. 
-
-```{r include=FALSE}
-
-```
+The ellipises in the documentation for the range() function indicates that the function can accept any number of arguments, beyond the required first argument. This means that you can pass multiple arguments to the range() function and it will compute the range over all of them. 
 
 ***
