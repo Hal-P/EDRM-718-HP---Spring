@@ -1,5 +1,7 @@
 ---
 title: "The Relationship of Mathematics Scores to Reading Scores"
+author: "Halle Prine"
+date: "`r Sys.Date()`"
 format: html
 ---
 
@@ -34,7 +36,41 @@ hsb2_list <- list(Low = hsb2_low,
 rm(hsb2, hsb2_low, hsb2_med, hsb2_high)
 ```
 
+```{r include=FALSE}
+# Calculate correlations and p-values for each SES level
+low_corr <- cor.test(hsb2_list[["Low"]][, "read"], hsb2_list[["Low"]][, "math"])
+med_corr <- cor.test(hsb2_list[["Medium"]][, "read"], hsb2_list[["Medium"]][, "math"])
+high_corr <- cor.test(hsb2_list[["High"]][, "read"], hsb2_list[["High"]][, "math"])
+```
 
+Below we have provided scatter plots Figure 1 to demonstrate the relationship between highschool student's reading and math score among 
+socioeconomic statuses (i.e., Low, Medium, and High). Table 1 provides the exact correlation table we can see that SES shares a moderately strong positive relationship between reading and math scores among low SES (`r round(low_corr$estimate, 2)` , p = `r round(low_corr$p.value, 3)`), (r = `r round(med_corr$estimate, 2)`, p = `r round(med_corr$p.value, 3)`), and high SES (r = `r round(high_corr$estimate, 2)`, p = `r round(high_corr$p.value, 3)`).
+
+*Table 1. Correlation Table Between Reading and Math Scores among Low, Medium, and High SES Status*
+
+```{r echo=FALSE}
+
+# Calculate correlations and p-values for each SES level
+low_corr <- cor.test(hsb2_list[["Low"]][, "read"], hsb2_list[["Low"]][, "math"])
+med_corr <- cor.test(hsb2_list[["Medium"]][, "read"], hsb2_list[["Medium"]][, "math"])
+high_corr <- cor.test(hsb2_list[["High"]][, "read"], hsb2_list[["High"]][, "math"])
+
+# Create a simple correlation table with significance
+correlation_table <- data.frame(
+  SES = c("Low", "Medium", "High"),
+  Correlation = round(c(low_corr$estimate, med_corr$estimate, high_corr$estimate), 2),
+  P_value = round(c(low_corr$p.value, med_corr$p.value, high_corr$p.value), 3),
+  Significance = c(ifelse(low_corr$p.value < 0.05, "Significant", "Not Significant"),
+                   ifelse(med_corr$p.value < 0.05, "Significant", "Not Significant"),
+                   ifelse(high_corr$p.value < 0.05, "Significant", "Not Significant"))
+)
+
+# Print the table
+print(correlation_table)
+
+```
+
+*Scatter Plots of Reading and Math Scores among Low, Medium, and High SES Status*
 
 ```{r echo=FALSE}
 par(mfrow = c(1, 3))  # Set up 3 plots in one row
@@ -64,16 +100,3 @@ for (ses in names(hsb2_list)) {
 par(mfrow = c(1, 1))  # Reset plot layout
 
 ```
-
-
-
-```{r include=FALSE}
-for (ses in names(hsb2_list)) {  
-  scores <- hsb2_list[[ses]]  
-  for (i in 1:nrow(scores)) {  
-    reading_score <- scores[i, "read"]  
-    print(paste("SES:", ses, "Subject:", i, "Reading Score:", reading_score))  
-  }  
-}  
-```
-
