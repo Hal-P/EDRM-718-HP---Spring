@@ -15,7 +15,7 @@ Hello my name is Halle Prine and this will be my Style Guide for EDRM 718. The p
 
 Your file names should be meaningful and concise with an .R at the end. The names of the files should also not be long or complicated. Examples of files names are as follows below:
 
-```         
+```{r}
 # A good file name
 Final_models.R
 
@@ -26,7 +26,7 @@ This_is_the_final_models_for_manuscript.R
 
 A Good tip to keep documents in sequential order is to number them with a numeric prefix. Additionally, adding a date can also help you identify your latest r-script.
 
-```         
+```{r}
 # Sequential number order
 0-download.R
 1-phase.R
@@ -39,7 +39,7 @@ Final_models012225.R
 
 When naming an object it is important to keep the name concise and easy to recognize. There should be now uppercase letters and the variable should be a noun. When naming a function the rule of thumb would be to naming them as a verb.
 
-```         
+```{r}
 # A good name
 student_mean
 
@@ -50,7 +50,7 @@ MEAN._.Std
 
 It would also be helpful to avoid names that are already existing functions within R. This will result in confusion and will pose to be a challenge for others trying to read your code. This infringes on reproducible research.
 
-```         
+```{r}
 # An example of this:
 std <- mean(x)
 
@@ -63,7 +63,7 @@ mean <- function(x) sum(x)
 
 Spacing in an r-script should be strategic and intentional. The use of spacing can either help an individual read your code better and or help you keep your script consistent and organized. Thus, there should be spaced around all infix operators (i.e., =, +, \<-, etc.) and after a comma.
 
-```         
+```{r}
 # Here is an example of good spacing 
 average <- mean(feet / 12 + inches, na.rm = TRUE)
 
@@ -73,19 +73,19 @@ average<-mean(feet/12+inches,na.rm=TRUE)
 
 There is only one exception to this rule (i.e., :, :: and :::) which does ***NOT*** require spaces around them.
 
-```         
+```{r}
 # This is the correct spacing for :, ::, :::
 x <- 1:5
 base::get
 
 # This is the INCORRECT spacing for :, ::, :::
 X <- 1 : 5
-base : : get
+base :  : get
 ```
 
 When using parentheses, its important to put a space *before* the left parentheses, ***EXCEPT*** in a function call.
 
-```         
+```{r}
 # The correct spacing for a left parentheses
 if (debug) do(x)
 plot(x, y)
@@ -97,7 +97,7 @@ plot (x, y)
 
 The use of extra spacing or indentations within a line of code is fine if it helps to align the code, equal signs, or assignments.
 
-```         
+```{r}
 list(
   total = a + b + c,
   mean = (a + b + c) / n
@@ -106,7 +106,7 @@ list(
 
 It's important to note that we should not place spaces around code in parentheses or square brackets. However, if a comma is present, then we can still put a space like how it is shown in the example above.
 
-```         
+```{r}
 # The correct way to space in reference to parentheses or square brackets
 if (debug) do(x)
 diamonds[5, ]
@@ -125,7 +125,7 @@ A good rule to follow when it comes to code character length is keeping it to 80
 
 When assigning operators/objects within your r code its important to use \<- instead of =, for the assignment. The = sign can be confusing and cause misinterpretations within your r script.
 
-```         
+```{r}
 # Correct assignment 
 x <- 3
 y <- "correct assignemnt"
@@ -145,7 +145,7 @@ The key component to any r script/document is organization. If there is inconsis
 
 When comments lack consistency then the document itself can become hard to read and follow:
 
-```         
+```{r}
 # Here is an example of consistent comments -------------------------------------------------
 
 # Here I am commenting in a consitent manner, the spacing is nice and 
@@ -159,7 +159,7 @@ When comments lack consistency then the document itself can become hard to read 
 
 A comment should summarize what the code is accomplishing. This is extremely helpful when you have complicated code.
 
-```         
+```{r}
 # An example of a helpful comment
 # Calculate pairwise agreement for each tier
 
@@ -178,7 +178,7 @@ MyVar <- 5
 
 Lets say you have been developing a line of code and r script for your manuscript and throughout the process you would go in and alter code. Whenever you do so it may be important to document the date you went back into the line of code and comment what you had changed.
 
-```         
+```{r}
 #########################
 # Final Manuscript code
 # 1/02/25 
@@ -196,3 +196,124 @@ t_result <- t.test(Score ~ Gender, data = University_data)
 # Adding age within the t.test
 t_result <- t.test(Score ~ Age, data = University_data)
 ```
+
+# Control Structures
+
+### Avoid Nested Loops
+
+A good control structure should keep nested loops to a minimum, since they can make your code too complicated and hard to follow. They should be broken down by tasks into separate functions or use vectorized operations. If nested loops must be used then make sure each loop serves a clear purpose.
+
+### Use Proper Indentation
+
+Always indent the code inside control structures (i.e., for, if, etc.) to improve readability:
+
+```{r}
+# Good Indentation
+for (ses in names(hsb2_list)) {
+  scores <- hsb2_list[[ses]]
+  plot(scores[, "read"], scores[, "math"])
+}
+
+# Bad Indentation
+
+```
+
+### Avoid Repetition in Loops
+
+In order to become good at creating control structures we need to learn how to make our code ***DRY:***
+
+-   ***D - don't***
+
+-   ***R*** - ***repeat***
+
+-   ***Y*** - ***yourself***
+
+To accomplish this we should define reusable functions outside the loop, and call them within.
+
+```{r}
+plot_correlation <- function(scores) {
+  correlation <- cor(scores[, "read"], scores[, "math"])
+  plot(scores[, "read"], scores[, "math"], main = paste("Correlation:", round(correlation, 2)))
+}
+for (ses in names(hsb2_list)) {
+  plot_correlation(hsb2_list[[ses]])
+}
+
+```
+
+### Avoid Long and Complex Loops
+
+If your loop is designed to do a lot of different things (i.e., plotting, calculating, text annotation, etc.,), then we need to ***break it into smaller pieces*** or use helper functions.
+
+A long loop can be hard to debug or maintain so keeping it simple and clean is more a efficient use of our time.
+
+### Document Your Loops and Conditionals 
+
+It is very important, when we create ***new*** or ***complicated*** loops to use helpful comments that describes the purpose of that loop and any key steps that are inside.
+
+```{r}
+# Loop through SES levels to create scatter plots for each group
+for (ses in names(hsb2_list)) {
+  scores <- hsb2_list[[ses]]
+  plot(scores[, "read"], scores[, "math"])
+}
+
+```
+
+### Consistent use of Curly Brackets  
+
+Always use curly brackets {} to define the body of loops, conditionals, and functions, even when there is only one line of code inside the block.
+
+```{r}
+# Good use of Curly Brackets 
+if (x > 0) {
+  print("Positive")
+}
+
+# Bad use of Curly Brackets 
+if (x > 0)
+  print("Positive")
+```
+
+This will improve the readability of the loops and reduce errors, especially if we go back and add more lines of code to the block.
+
+### Space Between Curly Brackets
+
+Consistent spacing is keep to any good control structure! The opening { should be on the same line as the control structure (i.e. for, if), and the closing should be on its own line.
+
+```{r}
+# Good Spacing 
+for (i in 1:5) {
+  print(i)
+}
+
+# Bad Spacing
+for(i in 1:5){print(i)}
+
+```
+
+### Proper use of Parentheses
+
+Parentheses () are often used for ***function calls*** and ***conditional checks***. Always check there is no space before the opening of the parenthesis, and put one space after the closing parenthesis for function arguments.
+
+```{r}
+# Good use of parentheses
+plot(x, y)
+
+# Bad use of parentheses
+plot (x, y)
+```
+
+### Consistent use of Square Brackets 
+
+Square brackets \[\] should be used to index data structures (i.e., vectors, matrices, data frames). When we need to access elements, make sure to use the correct number of brackets and always use comma for matrix/data frame indexing (i.e., \[row, column\] ).
+
+```{r}
+# Good use of Square Brackets 
+x = data[1, ]
+
+# Bad use of Square Brackets
+x = data[1]
+```
+
+For ***data frames***, ensure that you use square brackets for row and column indexing correctly.
