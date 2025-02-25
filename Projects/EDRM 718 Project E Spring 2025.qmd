@@ -1,0 +1,79 @@
+---
+title: "The Relationship of Mathematics Scores to Reading Scores"
+format: html
+---
+
+The *HSB2* data set consists of data from 200 randomly selected high school seniors. These data include five test scores, as well as demographic data. This report will show illustrate the relationship of mathematics scores to reading scores separately for each of three socioeconomic categories: low, medium, and high.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+# Clear the environment
+rm(list = ls())
+
+# Load the libraries
+library(here)
+
+# Read in the data
+hsb2 <- read.csv(here("Data", "hsb2.csv"))
+
+# Create a separate matrix for each SES level that contains the five test scores
+hsb2_low <- as.matrix(hsb2[hsb2$ses == 1, 7:11])
+hsb2_med <- as.matrix(hsb2[hsb2$ses == 2, 7:11])
+hsb2_high <- as.matrix(hsb2[hsb2$ses == 3, 7:11])
+
+# Eliminate matrix row names
+row.names(hsb2_low) <- NULL
+row.names(hsb2_med) <- NULL
+row.names(hsb2_high) <- NULL
+
+# Create a list with these three matrices
+hsb2_list <- list(Low = hsb2_low,
+                  Medium = hsb2_med,
+                  High = hsb2_high)
+
+# Remove the temporary objects
+rm(hsb2, hsb2_low, hsb2_med, hsb2_high)
+```
+
+
+
+```{r echo=FALSE}
+par(mfrow = c(1, 3))  # Set up 3 plots in one row
+
+for (ses in names(hsb2_list)) {  
+  scores <- hsb2_list[[ses]]  
+  
+  # Calculate the correlation between reading and math scores
+  correlation <- cor(scores[, "read"], scores[, "math"])
+  
+  # Round the correlation value for cleaner display
+  rounded_correlation <- round(correlation, 2)
+  
+  # Create the scatter plot for reading vs math
+  plot(scores[, "read"], scores[, "math"],  
+       xlab = "Reading Score", ylab = "Math Score",  
+       main = paste("SES:", ses), pch = 16, col = "blue")  
+  
+  # Add the correlation text to the plot
+  text(x = max(scores[, "read"]) - 10, y = max(scores[, "math"]) - 10, 
+       labels = paste("Correlation:", rounded_correlation), col = "red", cex = 1.2)
+  
+  # Optionally print the correlation for each SES group
+  print(paste("SES:", ses, "Correlation:", rounded_correlation))
+}
+
+par(mfrow = c(1, 1))  # Reset plot layout
+
+```
+
+
+
+```{r include=FALSE}
+for (ses in names(hsb2_list)) {  
+  scores <- hsb2_list[[ses]]  
+  for (i in 1:nrow(scores)) {  
+    reading_score <- scores[i, "read"]  
+    print(paste("SES:", ses, "Subject:", i, "Reading Score:", reading_score))  
+  }  
+}  
+```
+
