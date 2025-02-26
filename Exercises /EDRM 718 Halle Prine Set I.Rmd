@@ -1,0 +1,66 @@
+---
+title: "EDRM 718 Exercise Set I"
+arthor: "Halle Prine"
+output:
+  html_document:
+    df_print: paged
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Twelve points per item)*
+
+***
+
+**1. Write the function *hello_world* that will return the string of characters "Hello World!". Call your function with a print statement to announce your presence to the world.**
+
+```{r echo=FALSE}
+
+
+```
+
+
+***
+
+**2. Write the function *mean_median* that will take a numeric vector as an argument and return a two-item named vector with the mean and median. Demonstrate the use of the function with 50 random numbers from a distribution of your choice.**
+
+```{r echo=FALSE}
+
+
+```
+
+***
+
+**3. Write the function *cool_mean()* that you give two arguments: a numeric vector and an integer scalar. The function should calculate the mean of the vector and return this rounded to the number of digits indicated by the scalar. Make *2* be the default number of digits when the scalar is not provided. Demonstrate this function three times with the same 50 random numbers drawn from a distribution of your choice. First, do not include the scalar. Second, set the scalar to *0*. Finally, set the scalar to *4*.**
+
+```{r echo=FALSE}
+
+
+```
+
+***
+
+**4. Rewrite *cool_mean()* so that it checks to make sure that the vector is numeric and the scalar is an integer. Also make sure that the scalar is within range (non-negative). When one of these conditions is not the case, it should print "Please use the correct numeric types and ranges for the arguments." Demonstrate (a) correct use, (b) use with a non-numeric vector, and (c) use with a negative scalar.**
+
+```{r echo=FALSE}
+
+
+```
+
+***
+
+**5. When the Base R *summary()* function is given a numeric vector, it returns a named numeric vector with the five-number summary and the mean. The mean is always printed after the median, even when it is smaller than the median. Write the function *ordered_summary()* that will still provide the five-number summary and the mean, but now will do so in ascending numerical order. Demonstrate it with (a) 50 random numbers from a normal distribution such that the mean is greater than the median and (b) 50 random numbers from a normal distribution such that the mean is less than the median. Do not use the *set.seed()* function.**
+
+```{r echo=FALSE}
+
+
+```
+
+***
+
+**6. Write the function *mean_ci()* that is provided a numeric vector and a level of confidence (with a default of 0.95) and returns a list that includes the sample size, the sample mean, the sample standard deviation, the standard error, and a two-item named vector with the lower and upper bounds of the confidence interval. Demonstrate this function (a) by letting R print out the list and (b) by storing the list and then using it to print out only the confidence interval rounded to two decimal places. For your demonstration, use 200 numbers drawn at random from a normal distribution. Also report on whether the confidence interval included the true parameter or resulted in a Type I error. Use the *set.seed()* function so that your report of results will stay constant.**
+
+```{r echo=FALSE}
+
+
+```
+
+***
