@@ -14,6 +14,11 @@ output:
 
 ```{r echo=FALSE}
 
+hello_world <- function() {
+  return("Hello World!")
+}
+
+print(hello_world())
 
 ```
 
@@ -23,7 +28,17 @@ output:
 **2. Write the function *mean_median* that will take a numeric vector as an argument and return a two-item named vector with the mean and median. Demonstrate the use of the function with 50 random numbers from a distribution of your choice.**
 
 ```{r echo=FALSE}
+mean_median <- function(x) {
+  return(c(mean = mean(x), median = median(x)))
+}
 
+# Generate 50 random numbers from a normal distribution
+set.seed(123)  # Setting seed for reproducibility
+random_numbers <- rnorm(50, mean = 10, sd = 5)
+
+# Demonstrate the function
+result <- mean_median(random_numbers)
+print(result)
 
 ```
 
@@ -32,7 +47,23 @@ output:
 **3. Write the function *cool_mean()* that you give two arguments: a numeric vector and an integer scalar. The function should calculate the mean of the vector and return this rounded to the number of digits indicated by the scalar. Make *2* be the default number of digits when the scalar is not provided. Demonstrate this function three times with the same 50 random numbers drawn from a distribution of your choice. First, do not include the scalar. Second, set the scalar to *0*. Finally, set the scalar to *4*.**
 
 ```{r echo=FALSE}
+cool_mean <- function(x, digits = 2) {
+  return(round(mean(x), digits))
+}
 
+# Generate 50 random numbers from a uniform distribution
+set.seed(123)  # Ensures reproducibility
+random_numbers <- runif(50, min = 5, max = 15)
+
+# Demonstrations
+result1 <- cool_mean(random_numbers)   # Default (digits = 2)
+result2 <- cool_mean(random_numbers, 0)  # Rounded to 0 digits
+result3 <- cool_mean(random_numbers, 4)  # Rounded to 4 digits
+
+# Print results
+print(result1)
+print(result2)
+print(result3)
 
 ```
 
