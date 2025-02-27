@@ -72,7 +72,29 @@ print(result3)
 **4. Rewrite *cool_mean()* so that it checks to make sure that the vector is numeric and the scalar is an integer. Also make sure that the scalar is within range (non-negative). When one of these conditions is not the case, it should print "Please use the correct numeric types and ranges for the arguments." Demonstrate (a) correct use, (b) use with a non-numeric vector, and (c) use with a negative scalar.**
 
 ```{r echo=FALSE}
+cool_mean <- function(x, digits = 2) {
+  # Check if x is numeric and digits is a non-negative integer
+  if (!is.numeric(x) || !is.numeric(digits) || digits < 0 || digits != as.integer(digits)) {
+    return("Please use the correct numeric types and ranges for the arguments.")
+  }
+  
+  return(round(mean(x), digits))
+}
 
+# Generate 50 random numbers from a uniform distribution
+set.seed(123)
+random_numbers <- runif(50, min = 5, max = 15)
+
+# (a) Correct use
+print(cool_mean(random_numbers))         # Default digits = 2
+print(cool_mean(random_numbers, 0))      # Rounded to 0 digits
+print(cool_mean(random_numbers, 4))      # Rounded to 4 digits
+
+# (b) Incorrect use: Non-numeric vector
+print(cool_mean(c("a", "b", "c"), 2))    # Should print an error message
+
+# (c) Incorrect use: Negative scalar
+print(cool_mean(random_numbers, -1))     # Should print an error message
 
 ```
 
@@ -81,7 +103,21 @@ print(result3)
 **5. When the Base R *summary()* function is given a numeric vector, it returns a named numeric vector with the five-number summary and the mean. The mean is always printed after the median, even when it is smaller than the median. Write the function *ordered_summary()* that will still provide the five-number summary and the mean, but now will do so in ascending numerical order. Demonstrate it with (a) 50 random numbers from a normal distribution such that the mean is greater than the median and (b) 50 random numbers from a normal distribution such that the mean is less than the median. Do not use the *set.seed()* function.**
 
 ```{r echo=FALSE}
+ordered_summary <- function(x) {
+  # Compute the five-number summary and mean
+  summary_stats <- c(summary(x), mean = mean(x))
+  
+  # Sort the values in ascending order
+  return(sort(summary_stats))
+}
 
+# (a) Generate 50 random numbers where the mean is greater than the median
+random_numbers1 <- rnorm(50, mean = 15, sd = 5)
+print(ordered_summary(random_numbers1))
+
+# (b) Generate 50 random numbers where the mean is less than the median
+random_numbers2 <- rnorm(50, mean = 5, sd = 5)
+print(ordered_summary(random_numbers2))
 
 ```
 
@@ -90,7 +126,48 @@ print(result3)
 **6. Write the function *mean_ci()* that is provided a numeric vector and a level of confidence (with a default of 0.95) and returns a list that includes the sample size, the sample mean, the sample standard deviation, the standard error, and a two-item named vector with the lower and upper bounds of the confidence interval. Demonstrate this function (a) by letting R print out the list and (b) by storing the list and then using it to print out only the confidence interval rounded to two decimal places. For your demonstration, use 200 numbers drawn at random from a normal distribution. Also report on whether the confidence interval included the true parameter or resulted in a Type I error. Use the *set.seed()* function so that your report of results will stay constant.**
 
 ```{r echo=FALSE}
+mean_ci <- function(x, confidence = 0.95) {
+  n <- length(x)  # Sample size
+  mean_x <- mean(x)  # Sample mean
+  sd_x <- sd(x)  # Sample standard deviation
+  se_x <- sd_x / sqrt(n)  # Standard error
+  
+  # Compute the margin of error using the t-distribution
+  t_value <- qt((1 + confidence) / 2, df = n - 1)
+  margin_error <- t_value * se_x
+  
+  # Confidence interval
+  ci <- c(lower = mean_x - margin_error, upper = mean_x + margin_error)
+  
+  # Return results as a list
+  return(list(sample_size = n, 
+              sample_mean = mean_x, 
+              sample_sd = sd_x, 
+              standard_error = se_x, 
+              confidence_interval = ci))
+}
 
+# Set seed for reproducibility
+set.seed(123)
+
+# Generate 200 random numbers from a normal distribution with mean = 50 and sd = 10
+true_mean <- 50
+random_numbers <- rnorm(200, mean = true_mean, sd = 10)
+
+# (a) Print the full list output
+ci_result <- mean_ci(random_numbers)
+print(ci_result)
+
+# (b) Extract the confidence interval and round to two decimal places
+rounded_ci <- round(ci_result$confidence_interval, 2)
+print(rounded_ci)
+
+# Check if the true parameter is within the confidence interval
+if (true_mean >= rounded_ci["lower"] && true_mean <= rounded_ci["upper"]) {
+  print("The confidence interval includes the true mean. No Type I error.")
+} else {
+  print("The confidence interval does not include the true mean. Type I error occurred.")
+}
 
 ```
 
