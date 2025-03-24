@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Halle Prine">
-<meta name="dcterms.date" content="2025-02-24">
+<meta name="dcterms.date" content="2025-03-02">
 
 <title>The Relationship of Mathematics Scores to Reading Scores</title>
 <style>
@@ -64,7 +64,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 24, 2025</p>
+      <p class="date">March 2, 2025</p>
     </div>
   </div>
   
@@ -76,8 +76,15 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="description" class="level3">
+<h3 class="anchored" data-anchor-id="description">Description</h3>
 <p>The <em>HSB2</em> data set consists of data from 200 randomly selected high school seniors. These data include five test scores, as well as demographic data. This report will show illustrate the relationship of mathematics scores to reading scores separately for each of three socioeconomic categories: low, medium, and high.</p>
-<p>Below we have provided scatter plots Figure 1 to demonstrate the relationship between highschool student’s reading and math score among socioeconomic statuses (i.e., Low, Medium, and High). Table 1 provides the exact correlation table we can see that SES shares a moderately strong positive relationship between reading and math scores among low SES (0.62 , p = 0), (r = 0.59, p = 0), and high SES (r = 0.71, p = 0).</p>
+</section>
+<section id="analysis" class="level3">
+<h3 class="anchored" data-anchor-id="analysis">Analysis</h3>
+<p>Below we have provided scatter plots Figure 1 to demonstrate the relationship between highschool student’s reading and math score among socioeconomic statuses (i.e., Low, Medium, and High). Table 1 provides the exact correlation table we can see that SES shares a moderately strong positive relationship between reading and math scores among low SES (0.62 , p = 0), medium SES (r = 0.59, p = 0), and high SES (r = 0.71, p = 0).</p>
+<p>To achieve the purpose of this report, which was to determine whether the relationship between reading and math scores varies across different socioeconomic status groups, we calculated the r-squared values for each group. These values represent the proportion of variance in math scores that can be explained by reading scores, providing insight into how strongly academic performance in reading predicts the performance in math across low, medium, and high SES groups.</p>
+<p>We found that among the SES groups, students from the high SES level had the strongest relationship between reading and math scores, with an r-squared values of 0.51, p = 0, indicating that a large portion of the variability in math scores being explained by reading scores. In contrast, students from the low SES group had an r-squared value of 0.38, p = 0 while the medium SES group had a r-squared value of 0.35, p = 0. This indicates that among the low and medium SES groups about 38% and 35% of the variance in math scores is explained by the reading scores respectfully.</p>
 <p><em>Table 1. Correlation Table Between Reading and Math Scores among Low, Medium, and High SES Status</em></p>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
@@ -87,14 +94,8 @@ ul.task-list li input[type="checkbox"] {
 3   High        0.71       0  Significant</code></pre>
 </div>
 </div>
-<p><em>Scatter Plots of Reading and Math Scores among Low, Medium, and High SES Status</em></p>
+<p><em>Figure 1.Scatter Plots of Reading and Math Scores among Low, Medium, and High SES Status</em></p>
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "SES: Low Correlation: 0.62"</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "SES: Medium Correlation: 0.59"</code></pre>
-</div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -102,10 +103,13 @@ ul.task-list li input[type="checkbox"] {
 </figure>
 </div>
 </div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "SES: High Correlation: 0.71"</code></pre>
 </div>
-</div>
+</section>
+<section id="conclusions" class="level3">
+<h3 class="anchored" data-anchor-id="conclusions">Conclusions</h3>
+<p>The report examined the relationship between math and reading scores among 200 high school students across different SES group (low, medium, and high). Our correlation analysis revealed that each SES group had a significant relationship with math and reading scores. Examining the explained vairance through r-squared values, we found that students classified as high SES had a greater portion of the variability in math scores explained by student’s reading scores. Among low and medium SES groups students showed a moderate relationship between their SES group and reading/math scores, however the proportion of variability in math scores could only be explained 38-35% by their reading scores.</p>
+<p>While these relationships between low and medium SES groups are meaningful, the r-squared values suggest there is a substantial amount of unexplained variance in both groups. Even for those in high SES groups there is still over 49% of the variance that is not fully explained, this indicates that there are more unmeasured factors-beyond reading scores-that play a role in influencing math scores among different SES groups. Future research should investigate what other factors may influence the relationship between reading and math scores among different SES groups, unravelung the complecity of the relationship.</p>
+</section>
 
 </main>
 <!-- /main column -->

@@ -16,6 +16,7 @@ library(here)
 
 students <- read.csv(here("Data", "hsb2.csv"), header = TRUE, sep = ",")
 
+
 # Select only the five standardized test score columns 
 test_scores <- students[, c("read", "write", "math", "science", "socst")]
 
@@ -60,6 +61,7 @@ Read_table <- round(rbind(
 ), 1)  # Rounding to 1 decimal place
 
 Read_table
+
 
 ```
 

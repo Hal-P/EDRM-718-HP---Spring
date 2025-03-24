@@ -1,0 +1,52 @@
+---
+title: "EDRM 718 Exercise Set J"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+*Use **ggplot2()** for all items in this exercise set. Use the **hsb2** data for item 1 through item 6.*
+
+***
+
+**1. Create a histogram of math scores.**
+
+***
+
+**2. Create a scatterplot to illustrate the relationship of math and science scores. Put math on the horizontal axis.**
+
+***
+
+**3. Create a scatterplot to illustrate the relationship of math and science scores. Put math on the horizontal axis. Use different colors to indicate the SES for each student in the plot. Put a linear regression line on your plot.**
+
+***
+
+**4. Create two faceted scatterplots to illustrate the relationship of math and science scores: one for private school students and one for public school students. Put math on the horizontal axis of each plot. Use different colors to indicate the SES for each student in the plots. Put a linear regression line on your plots.**
+
+***
+
+**5. Create side-by-side boxplots to illustrate the differences in math scores of students from different SES groups. Include points for every student in your plot. Also plot the mean for each group.**
+
+***
+
+**6. Create stacked bar plots to illustrate how SES groupings is related to the private-public school distinction. Plot proportions on the vertical axis.**
+
+***
+
+*Use the **mental health study** data for item 7.*
+
+***
+
+**7. Use the mental health study data to graphically explore the relationship of life events and SES on mental health impairment. Your graph should illustrate whether SES moderates the influence of life events on mental health.**
+
+***
+
+*Use the **notes study** data for item 8.*
+
+***
+
+**8. Use the notes study data to graphically explore the relationship of method of note taking to later recall. Your graph should illustrate whether the type of lecture moderates the effect of note taking method on recall.**
+
+***

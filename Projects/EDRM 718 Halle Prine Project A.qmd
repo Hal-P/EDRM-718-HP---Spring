@@ -247,7 +247,7 @@ If your loop is designed to do a lot of different things (i.e., plotting, calcul
 
 A long loop can be hard to debug or maintain so keeping it simple and clean is more a efficient use of our time.
 
-### Document Your Loops and Conditionals 
+### Document Your Loops and Conditionals
 
 It is very important, when we create ***new*** or ***complicated*** loops to use helpful comments that describes the purpose of that loop and any key steps that are inside.
 
@@ -260,7 +260,7 @@ for (ses in names(hsb2_list)) {
 
 ```
 
-### Consistent use of Curly Brackets  
+### Consistent use of Curly Brackets
 
 Always use curly brackets {} to define the body of loops, conditionals, and functions, even when there is only one line of code inside the block.
 
@@ -304,7 +304,7 @@ plot(x, y)
 plot (x, y)
 ```
 
-### Consistent use of Square Brackets 
+### Consistent use of Square Brackets
 
 Square brackets \[\] should be used to index data structures (i.e., vectors, matrices, data frames). When we need to access elements, make sure to use the correct number of brackets and always use comma for matrix/data frame indexing (i.e., \[row, column\] ).
 

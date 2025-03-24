@@ -1,0 +1,126 @@
+---
+title: "EDRM 718 Instructor Exercise Set A Spring 2025"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+*The first item is a "warm-up" item, just to make sure you are paying attention. The remainder of the items are about recreating the types of graphs that you teach in your first two educational statistics courses. Use **ggplot2()** with all items. You can earn bonus points by first showing how you created the graph in Base R and then illustrating how to obtain it with **ggplot2()**.*
+
+```{r include=FALSE}
+install.packages("tidyverse")
+library(here)
+library(tidyverse)
+
+```
+
+
+***
+
+**1. Create an outline of the continental United States. (Hint: Install the *mapproj* package to make some data available for you when you create this outline.)**
+```{r include=FALSE}
+states <- map_data("state")
+
+ggplot(states, aes(long, lat, group = group)) +
+  gemo_polygon() +
+  coord_map () +
+  theme(axis.title = element_blank (),
+        axis.text = element_blank (),
+        panel.background = element_blank ()) 
+
+```
+
+
+***
+
+**2. Create a a histogram of passenger ages on the Titanic.**
+
+```{r include=FALSE}
+Titanic <- read.csv(here("Data", "Titanic Passenger Data.csv"))
+
+# Construct a hisogram 
+his(Titanic$age,
+    xlab = "Age (in years)",
+    main
+    
+
+```
+
+```{r include=FALSE}
+Titanic <- as_tibble(Titanic)
+
+Titanic %>%
+  ggplot(aes(x = age)) +
+  geom_histogram(bindwidth = 5, 
+                 color = "Red",
+                 fill = "Blue") +
+  labs(title = "Histogram of Titanic Passenger Ages",
+       x= "Age (in years)",
+       y = "Frequency")
+```
+
+***
+
+**3. Illustrate the relationship of state average starting salaries to the average salary of teachers in the United States.**
+
+```{r include=FALSE}
+
+load(here("data", "stateseduc.RData"))
+
+
+
+```
+
+```{r include=FALSE}
+
+stateseduc %>%
+  ggplot(aes(x = Start.Salary/1000, y = Avg.Salary/1000)) +
+  geom_point() + 
+  labs(title = "relationship of starting and avergae teacher salaries in states",
+       x = "starting salary of teachers in state (in 1,000)",
+       y = "avergae salary of teachers in state (in 1,000)",
+       
+
+
+```
+
+***
+
+**4. Illustrate the relationship of state average starting salaries to the average salary of teachers for each region in the United States.**
+```{r include=FALSE}
+
+
+```
+
+
+***
+
+**5. Illustrate the relationship of average salary of teachers in the United States to the different regions of the United States.**
+```{r include=FALSE}
+boxplot(stateseduc$Avg.Salary/1000)
+
+```
+
+***
+
+**6. Illustrate the relationship of average salary of teachers in the United States to the different regions of the United States and include the means on your graph.**
+
+***
+
+**7. Illustrate passenger class composition on the Titanic.**
+
+***
+
+**8. Illustrate the relationship of survival to passenger class on the Titanic.**
+
+***
+
+**9. Graphically explore the relationship of brain size to IQ and determine if this relationship depends on height.**
+
+***
+
+**10. Graphically analyze the data obtained using a two-factor experimental design to study the tooth growth of guinea pigs.**
+
+***
