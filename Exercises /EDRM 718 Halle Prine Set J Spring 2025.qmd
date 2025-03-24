@@ -1,4 +1,5 @@
 ---
+Author: "Halle Prine"
 title: "EDRM 718 Exercise Set J"
 format: html
 ---
@@ -9,25 +10,125 @@ format: html
 
 *Use **ggplot2()** for all items in this exercise set. Use the **hsb2** data for item 1 through item 6.*
 
+```{r echo=FALSE}
+
+library(ggplot2)
+library(here)
+here()
+
+# Had to reset my Here library 
+setwd("/Users/halleprine/Desktop/GitREPO/EDRM 718 HP - Spring")
+getwd()
+here::i_am("Data/hsb2.csv")
+
+
+# I read the data and put it in an object called "school".
+school <- read.csv(here("Data", "hsb2.csv"), header = FALSE, sep = ",") # Read the file
+View(school)
+
+# Columns not named correctly I had to go in and rename them and remove first row
+names(school)[names(school)=="V1"]<-"ID" 
+names(school)[names(school)=="V2"]<-"sex"
+names(school)[names(school)=="V3"]<-"race"
+names(school)[names(school)=="V4"]<-"ses"
+names(school)[names(school)=="V5"]<-"schtyp"
+names(school)[names(school)=="V6"]<-"prog"
+names(school)[names(school)=="V7"]<-"read"
+names(school)[names(school)=="V8"]<-"write"
+names(school)[names(school)=="V9"]<-"math"
+names(school)[names(school)=="V10"]<-"science"
+names(school)[names(school)=="V11"]<-"socst"
+
+school <- school[-c(1), ]
+
+```
+
+
 ***
 
 **1. Create a histogram of math scores.**
+
+```{r echo=FALSE}
+str(school$math)
+school$math <- as.numeric(as.character(school$math))
+
+ggplot(school, aes(x = math)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
+  labs(title = "Histogram of Math Scores",
+       x = "Math score",
+       y = "Frequency") +
+  theme_minimal()
+
+```
 
 ***
 
 **2. Create a scatterplot to illustrate the relationship of math and science scores. Put math on the horizontal axis.**
 
+```{r echo=FALSE}
+
+ggplot(school, aes(x = math, y = science)) +
+  geom_point(color = "blue") +
+  labs(title = "Scatterplot of Math vs. Science Scores",
+       x = "Math Score",
+       y = "Science Scores") +
+  theme_minimal()
+
+```
+
 ***
 
 **3. Create a scatterplot to illustrate the relationship of math and science scores. Put math on the horizontal axis. Use different colors to indicate the SES for each student in the plot. Put a linear regression line on your plot.**
+
+```{r echo=FALSE}
+
+ggplot(school, aes(x = math, y = science, color = factor(ses))) +
+  geom_point() +
+  labs(title = "Scatterplot of Math vs. Science Scores with SES",
+       x = "Math Score",
+       y = "Science Scores",
+       color = "SES") +
+  theme_minimal()
+
+```
 
 ***
 
 **4. Create two faceted scatterplots to illustrate the relationship of math and science scores: one for private school students and one for public school students. Put math on the horizontal axis of each plot. Use different colors to indicate the SES for each student in the plots. Put a linear regression line on your plots.**
 
+```{r echo=FALSE}
+
+ggplot(school, aes(x = math, y = science, color = factor(ses))) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE, aes(group = 1), color = "black") +
+  facet_wrap(~ factor(schtyp, labels = c("Public", "Private"))) +
+  labs(title = "Scatterplot of Math vs. Science Scores by School Type",
+       x = "Math Score",
+       y = "Science Scores",
+       color = "SES") +
+  theme_minimal()
+
+```
+
+
 ***
 
 **5. Create side-by-side boxplots to illustrate the differences in math scores of students from different SES groups. Include points for every student in your plot. Also plot the mean for each group.**
+
+```{r echo=FALSE}
+
+ggplot(school, aes(x = ses, y = math)) +
+  geom_boxplot(fill = "lightblue", color = "black", outlier.shape = NA) +
+  geom_jitter(aes(color = ses), width = 0.2, alpha = 0.6) +
+  stat_summary(fun = "mean", geom = "point", shape = 18, size = 3, color = "red")
+  labs(title = "Scatterplot of Math vs. Science Scores by School Type",
+       x = "Math Score",
+       y = "Science Scores",
+       color = "SES") +
+  theme_minimal()
+
+```
+
 
 ***
 
@@ -35,7 +136,7 @@ format: html
 
 ***
 
-*Use the **mental health study** data for item 7.*
+*Use the **mental health study* *data for item 7.*
 
 ***
 
