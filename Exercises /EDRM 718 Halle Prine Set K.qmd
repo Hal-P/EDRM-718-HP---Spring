@@ -1,0 +1,92 @@
+---
+title: "EDRM 718 Exercise Set K"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+*These exercises will lead you through the steps of preparing the **College Study Data** for analysis by cleaning it and importing it into R.*
+
+***
+
+**1. Import the *College Study Data* into a tibble and store the problems in a second tibble.**
+
+***
+
+**2. Display the rows in the imported data that contained identified problems. (Hint: Every row is considered during the import, including the header row, so row numbers in your imported data will not match the original row numbers that are identified in the problems tibble.)**
+
+***
+
+**3. Display these same rows in the original data, prior to import. (Hint: The basic R read.csv() function does not look for problems or make adjustments, so one trick is to read the same data into another object using this function.)**
+
+***
+
+**4. Compare the two different displays of problem rows. For each row, state what the problem appears to have been and explain how the *read_csv()* function addressed the problem.**
+
+***
+
+**5. For each problem row, explain whether you agree or disagree with how *read_csv()* handled the issue. Briefly defend each agreement and/or disagreement.**
+
+***
+
+**6. If you disagreed with any of the solutions used by the *read_csv()* function, change the data in the problem row(s) to what you believe is correct. Show these row(s) when you are done.**
+
+***
+
+**7. Note the types of data that the parse guesser chose for each variable. Identify which of these are incorrect and briefly explain why these are incorrect.**
+
+***
+
+**8. You have already fixed some of the problems, so use the *write_csv()* function to save the data with the revisions you have made to this point. You should never delete original files, so use a different file name.**
+
+***
+
+**9. Clear your environment and read back in the file you just saved. This time specify the *col_types* argument so that each variable is set to the type you believe it should be. Store the problems in a tibble.**
+
+***
+
+**10. As you did before, compare the problem rows with the original data. For each problem, explain what you believe the problem to be and whether you are satisfied with the solution used by *read_csv()*. If not, state how you propose to fix it.**
+
+***
+
+**11. If you proposed any changes, go ahead an make them and show the result. If not, you can skip this item.**
+
+***
+
+**12. Check that the identification numbers have a reasonable range and that they are all unique.**
+
+***
+
+**13. When these data were collected some time ago, it was common to consider only two gender types. Check that this is the case for these data. If there are inconsistencies, find the offending rows and display them. (Hint: The *table()* function is helpful when studying categorical data.)**
+
+***
+
+**14. Fix any gender inconsistencies by changing the data in the way you believe makes the most sense. When you are done, display the corrected rows and again check the gender variable.**
+
+***
+
+**15. Use a similar procedure to check the *class* variable. If any changes are needed, fix them and then show that you have fixed the problems.**
+
+***
+
+**16. Check the range of the GPA variable. If any of the rows are out of range, decide how to fix each row so that you no longer have out of range data.**
+
+***
+
+**17. Check the scale1 variable and make changes if there are any issues. (Hint: Even though this variable is an integer, there are only five values so that the *table()* function may again prove useful.)**
+
+***
+
+**18. Use similar methods to check the scale2 variable and make changes if there are any issues.**
+
+***
+
+**19. Even though you already specified the class of each variable when you read in the data, check these again to make sure they are ready for analysis. (Hint: You may have cleaned up character data for variables that can now become factors.)**
+
+***
+
+**20. Write your data to a file entitled *College Study Data (Clean).csv*.**
+
+***
