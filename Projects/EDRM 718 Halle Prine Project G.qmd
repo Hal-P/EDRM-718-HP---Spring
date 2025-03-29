@@ -1,0 +1,272 @@
+---
+title: "EDRM 718 Halle Prine Project G"
+author: "Halle Prine"
+format: html
+editor: visual
+---
+
+```{r include=FALSE}
+install.packages("jsonlite")
+install.packages("gt")
+rm(list = ls())
+library(here)
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(readr)
+library(ggplot2)
+library(dplyr)
+library(gt)
+library(Hmisc)
+
+
+# URL for the survey results CSV
+survey_data_url <- "https://data.wprdc.org/dataset/33891263-235f-4c6c-af8a-c79b0114a9f9/resource/c29c46fe-5bf7-431a-9c1c-a9e2e4e81eff/download/ucsur-soa-data-for-distribution-2015-oct-14.csv"
+
+# Use GET() to request the data
+response <- GET(survey_data_url)
+
+# Check the status of the response
+if (status_code(response) == 200) {
+  # Read the content into a data frame
+  survey_data <- read_csv(content(response, as = "text"))
+  
+  # View the first few rows of the dataset
+  head(survey_data)
+} else {
+  stop("Failed to download data: HTTP status ", status_code(response))
+}
+
+```
+
+```{r include=FALSE}
+# View first few rows
+head(survey_data)
+
+# Quick summary
+summary(survey_data)
+
+# Check variable names
+names(survey_data)
+```
+
+Research Question: Is happiness associated with work status among older adults in Allegheny County?
+
+```{r include=FALSE}
+
+# Recode work1 into a readable factor
+survey_data <- survey_data %>%
+  mutate(work_status = factor(work1,
+                              levels = c(1, 2),
+                              labels = c("Currently working", "Not working")))
+
+# Plot happiness by work status
+ggplot(filter(survey_data, !is.na(work_status)), aes(x = work_status, y = happy1)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Happiness by Work Status",
+       x = "Work Status",
+       y = "Happiness Rating (1–10)")
+
+
+survey_data %>%
+  filter(!is.na(work_status), !is.na(happy1)) %>%
+  group_by(work_status) %>%
+  summarise(
+    n = n(),
+    mean_happiness = round(mean(happy1, na.rm = TRUE), 2),
+    sd_happiness = round(sd(happy1, na.rm = TRUE), 2)
+  ) %>%
+  gt() %>%
+  tab_header(
+    title = "Happiness Summary by Work Status"
+  )
+
+
+
+# Scatter plot
+
+# Remove extreme values in happy1 (e.g., > 10)
+survey_data_clean <- survey_data %>%
+  filter(happy1 <= 10)
+
+ggplot(filter(survey_data_clean, !is.na(work_status)), aes(x = work_status, y = happy1)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Happiness by Work Status (Outliers Removed)",
+       x = "Work Status", y = "Happiness Rating (1–10)")
+
+ggplot(filter(survey_data_clean, !is.na(work_status)), aes(x = happy1, fill = work_status)) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Distribution of Happiness by Work Status",
+       x = "Happiness Rating", y = "Density") +
+  theme_minimal()
+
+
+# t.test
+
+t.test(happy1 ~ work_status, data = survey_data_clean)
+
+
+# grphing these confidence intervals
+
+# Summarize means and CIs
+ci_summary <- survey_data_clean %>%
+  group_by(work_status) %>%
+  summarise(
+    n = n(),
+    mean_happy = mean(happy1, na.rm = TRUE),
+    sd_happy = sd(happy1, na.rm = TRUE),
+    se = sd_happy / sqrt(n),
+    ci_lower = mean_happy - qt(0.975, df = n - 1) * se,
+    ci_upper = mean_happy + qt(0.975, df = n - 1) * se
+  )
+
+# scatter Ploting the confidence intervals
+
+
+# Calculate group means and 95% CIs
+ci_summary <- survey_data_clean %>%
+  group_by(work_status) %>%
+  summarise(
+    n = n(),
+    mean_happy = mean(happy1, na.rm = TRUE),
+    sd_happy = sd(happy1, na.rm = TRUE),
+    se = sd_happy / sqrt(n),
+    ci_lower = mean_happy - qt(0.975, df = n - 1) * se,
+    ci_upper = mean_happy + qt(0.975, df = n - 1) * se
+  )
+
+# Plot as scatter with error bars
+ggplot(ci_summary, aes(x = work_status, y = mean_happy)) +
+  geom_point(size = 4, color = "blue") +
+  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.15, color = "blue") +
+  labs(
+    title = "Mean Happiness by Work Status (with 95% CI)",
+    x = "Work Status",
+    y = "Mean Happiness Rating"
+  ) +
+  theme_minimal()
+
+
+# possible linear regression between work and happiness
+model <- lm(happy1 ~ work1 + age + income + educ + PHQ2 + sex + marstat, data = survey_data_clean)
+summary(model)
+
+
+# New TOPIC QUESTION
+install.packages("corrr")
+library(corrr)
+
+survey_data_clean %>%
+  select(happy1, PHQ2, income, age, educ) %>%
+  correlate() %>%
+  fashion()
+
+model <- lm(happy1 ~ work1 + income + PHQ2 + age + educ + sex + marstat, data = survey_data_clean)
+summary(model)
+
+
+ggplot(survey_data_clean, aes(x = PHQ2, y = happy1)) +
+  geom_jitter(alpha = 0.3, width = 0.2) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(title = "Happiness by Depression Score",
+       x = "PHQ2 Score", y = "Happiness")
+
+ggplot(survey_data_clean, aes(x = income, y = happy1)) +
+  geom_jitter(alpha = 0.3, width = 0.2) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(title = "Happiness by Depression Score",
+       x = "Income", y = "Happiness")
+
+ggplot(survey_data_clean, aes(x = work1, y = happy1)) +
+  geom_jitter(alpha = 0.3, width = 0.2) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
+  labs(title = "Happiness by Depression Score",
+       x = "Work", y = "Happiness")
+
+
+```
+
+```{r include=FALSE}
+
+table(survey_data_clean$work1, useNA = "always")
+
+
+survey_data_clean <- survey_data_clean %>%
+  filter(work1 %in% c(1, 2)) %>%  # keep only working and not working
+  mutate(
+    work1 = factor(work1, levels = c(1, 2),
+                   labels = c("Currently working", "Not working"))
+  )
+
+
+survey_data_clean <- survey_data_clean %>%
+  mutate(
+    income = factor(income, levels = 1:8, ordered = TRUE,
+                    labels = c(
+                      "<$10k", "$10–20k", "$20–30k", "$30–40k",
+                      "$40–50k", "$50–75k", "$75–100k", ">$100k"))
+  )
+
+
+survey_data_clean <- survey_data_clean %>%
+  mutate(
+    phq_cat = case_when(
+      PHQ2 <= 2 ~ "None to mild",
+      PHQ2 <= 4 ~ "Moderate",
+      PHQ2 >= 5 ~ "Severe"
+    ) %>% factor(levels = c("None to mild", "Moderate", "Severe"))
+  )
+
+
+model_factor <- lm(happy1 ~ work1 + income + phq_cat + age + educ + sex + marstat, data = survey_data_clean)
+summary(model_factor)
+
+
+
+# plots
+
+ggplot(survey_data_clean, aes(x = PHQ2, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE, color = "firebrick", fill = "pink") +
+  labs(title = "Happiness by Depression (PHQ2)",
+       x = "PHQ2 Score (Depression Symptoms)",
+       y = "Happiness Rating (1–10)") +
+  theme_minimal()
+
+ggplot(survey_data_clean, aes(x = income, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE, color = "steelblue", fill = "lightblue") +
+  labs(title = "Happiness by Income",
+       x = "Income Bracket",
+       y = "Happiness Rating (1–10)") +
+  theme_minimal()
+
+ggplot(survey_data_clean, aes(x = work1, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE, color = "darkgreen", fill = "lightgreen") +
+  labs(title = "Happiness by Work Status",
+       x = "Work Status",
+       y = "Happiness Rating (1–10)") +
+  theme_minimal()
+
+ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
+  geom_boxplot(fill = "lightpink") +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "darkred") +
+  labs(title = "Happiness by Depression Category",
+       x = "Depression Level",
+       y = "Happiness Rating (1–10)") +
+  theme_minimal()
+
+ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "gray40") +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 4, color = "darkred") +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.15, color = "darkred") +
+  labs(
+    title = "Happiness by Depression Category (PHQ-2)",
+    x = "Depression Level",
+    y = "Happiness Rating (1–10)"
+  ) +
+  theme_minimal()
+
+
+```
