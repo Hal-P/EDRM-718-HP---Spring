@@ -270,3 +270,99 @@ ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
 
 
 ```
+
+
+
+```{r include=FALSE}
+# Load libraries
+library(tidyverse)
+library(ggplot2)
+library(emmeans)
+library(psych)
+library(corrr)
+
+# Clean and prepare data
+survey_data_clean <- survey_data %>%
+  filter(work1 %in% c(1, 2)) %>%
+  mutate(
+    work1 = factor(work1, levels = c(1, 2),
+                   labels = c("Currently working", "Not working")),
+    income = factor(income, levels = 1:8, ordered = TRUE,
+                    labels = c("<$10k", "$10–20k", "$20–30k", "$30–40k",
+                               "$40–50k", "$50–75k", "$75–100k", ">$100k")),
+    phq_cat = case_when(
+      PHQ2 <= 2 ~ "None to mild",
+      PHQ2 <= 4 ~ "Moderate",
+      PHQ2 >= 5 ~ "Severe"
+    ) %>% factor(levels = c("None to mild", "Moderate", "Severe"))
+  )
+
+# Descriptive statistics of key variables
+describe(survey_data_clean %>% select(happy1, PHQ2, age, sex, educ, income))
+
+ggplot(survey_data_clean, aes(x = happy1)) +
+  geom_histogram(binwidth = 1, fill = "lightblue", color = "black") +
+  labs(title = "Distribution of Happiness Ratings") +
+  theme_minimal()
+
+# Correlation table of numeric predictors
+survey_data_clean %>%
+  select(happy1, PHQ2, age, educ) %>%
+  correlate() %>%
+  fashion()
+
+# Linear regression model
+model <- lm(happy1 ~ work1 + income + phq_cat + age + educ + sex + marstat,
+            data = survey_data_clean)
+summary(model)
+
+# PHQ2 category plot with jitter and confidence intervals
+ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "gray40") +
+  stat_summary(fun = mean, geom = "point", shape = 18, size = 4, color = "darkred") +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.15, color = "darkred") +
+  labs(
+    title = "Happiness by Depression Category (PHQ-2)",
+    x = "Depression Level",
+    y = "Happiness Rating (1–10)"
+  ) +
+  theme_minimal()
+
+# Income vs happiness plot
+ggplot(survey_data_clean, aes(x = income, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3) +
+  geom_smooth(method = "lm", se = TRUE, color = "steelblue", fill = "lightblue") +
+  labs(
+    title = "Happiness by Income",
+    x = "Income Bracket",
+    y = "Happiness Rating (1–10)"
+  ) +
+  theme_minimal()
+
+# Work status vs happiness (jitter + mean + CI)
+summary_stats <- survey_data_clean %>%
+  group_by(work1) %>%
+  summarize(
+    mean_happy = mean(happy1, na.rm = TRUE),
+    se = sd(happy1, na.rm = TRUE) / sqrt(n()),
+    n = n()
+  ) %>%
+  mutate(
+    ci_lower = mean_happy - 1.96 * se,
+    ci_upper = mean_happy + 1.96 * se
+  )
+
+ggplot(survey_data_clean, aes(x = work1, y = happy1)) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "gray40") +
+  geom_point(data = summary_stats, aes(y = mean_happy), size = 4, color = "darkgreen") +
+  geom_errorbar(data = summary_stats, aes(ymin = ci_lower, ymax = ci_upper), width = 0.15, color = "darkgreen") +
+  labs(
+    title = "Happiness by Work Status",
+    x = "Work Status",
+    y = "Happiness Rating (1–10)"
+  ) +
+  theme_minimal()
+
+```
+
+
