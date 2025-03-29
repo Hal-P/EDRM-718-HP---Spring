@@ -52,6 +52,8 @@ school <- school[-c(1), ]
 str(school$math)
 school$math <- as.numeric(as.character(school$math))
 
+as.tibble(schoo)
+
 ggplot(school, aes(x = math)) +
   geom_histogram(binwidth = 5, fill = "blue", color = "black", alpha = 0.7) +
   labs(title = "Histogram of Math Scores",
@@ -67,12 +69,17 @@ ggplot(school, aes(x = math)) +
 
 ```{r echo=FALSE}
 
+school$science <- as.numeric(school$science)
+school$math <- as.numeric(school$math)
+
 ggplot(school, aes(x = math, y = science)) +
   geom_point(color = "blue") +
+  geom_smooth(method = "lm", color = "red", se = FALSE) +  
   labs(title = "Scatterplot of Math vs. Science Scores",
        x = "Math Score",
-       y = "Science Scores") +
+       y = "Science Score") +
   theme_minimal()
+
 
 ```
 
@@ -84,6 +91,7 @@ ggplot(school, aes(x = math, y = science)) +
 
 ggplot(school, aes(x = math, y = science, color = factor(ses))) +
   geom_point() +
+  geom_smooth(formula = y ~ x, method = "lm", se = FALSE)
   labs(title = "Scatterplot of Math vs. Science Scores with SES",
        x = "Math Score",
        y = "Science Scores",
@@ -165,20 +173,16 @@ library(readxl)
 mental <- read_excel(here("Data", "Mental Health Study Data.xlsx"), sheet = 1)
 View(mental)
 
-# Factor SES if not already
-mental$SES <- factor(mental$SES, levels = c(1, 2, 3), labels = c("Low", "Medium", "High"))
 
-# Create the plot
-ggplot(notes_dta, aes(x = notes, y = score, color = notes)) +
-  geom_point(aes(shape = lecture), alpha = 0.6) +  # Plot points with different shapes for LectureType
-  geom_smooth(method = "lm", se = TRUE, linetype = "solid") +  # Add regression line without interaction
-  labs(title = "Effect of Note-Taking Method on Recall",
-       x = "Note-Taking Method",
-       y = "Recall Score",
-       color = "Note-Taking Method",
-       shape = "Lecture Type") +
-  theme_minimal() +
-  theme(legend.position = "top")  # Adjust legend position
+mental%>%
+  mutate(SES_cat = cut (SES, breaks = 2, labels = c("Low", "High"))) %>%
+  ggplot(aes(x = LifeEvts, y = MentImp, color = SES_cat)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = TRUE, linetype = "solid") + 
+  labs(title = "Moderating Effect of SES on Life Events and Mental Health Impairement",
+       x = "Life Events",
+       y = "Mental Health Impairement") +
+  scale_color_discrete(name = "SES")
 
 
 ```
@@ -197,20 +201,16 @@ ggplot(notes_dta, aes(x = notes, y = score, color = notes)) +
 notes_dta <- read_excel(here("Data", "Notes Data.xlsx"), sheet = 1)
 View(notes)
 
-# Factor the lecture and note-taking method columns for better plotting
-notes_dta$lecture <- factor(notes_dta$lecture, levels = c(1, 2), labels = c("Disorganized", "Organized"))
-notes_dta$notes <- factor(notes_dta$notes, levels = c(1, 2, 3), labels = c("Outline", "Linear", "Matrix"))
-
-ggplot(notes_dta, aes(x = score, y = factor(notes), color = factor(notes))) +
-  geom_point(aes(shape = factor(lecture)), alpha = 0.6) +  # Convert lecture to a factor
-  geom_smooth(aes(group = factor(notes)), method = "lm", se = TRUE, linetype = "solid") +  # Add regression lines
-  labs(title = "Effect of Note-Taking Method on Recall, Moderated by Lecture Type",
-       x = "Recall Score",
-       y = "Note-Taking Method",
-       color = "Note-Taking Method",
-       shape = "Lecture Type") +
-  theme_minimal() +
-  theme(legend.position = "top")  # Adjust legend position
+ggplot(notes_dta, aes(x = notes, y = score, fill = lecture)) +
+  geom_boxplot(alpha = 0.4, position = position_dodge(0.8), outlier.shape = NA) +  # Boxplots in the background
+  stat_summary(fun = mean, geom = "point", aes(color = lecture), size = 3, position = position_dodge(0.3)) +  # Mean points
+  stat_summary(fun = mean, geom = "line", aes(color = lecture, group = lecture), position = position_dodge(0.3)) +  # Connect means
+  labs(title = "Effect of Note-Taking Method on Recall by Lecture Type",
+       x = "Note-Taking Method",
+       y = "Recall Score",
+       fill = "Lecture Type",
+       color = "Lecture Type") +
+  theme_minimal()
 
 ```
 
