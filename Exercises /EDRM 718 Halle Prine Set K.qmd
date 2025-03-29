@@ -22,46 +22,10 @@ library(readr)
 library(readxl)
 
 # Import the College Study Data into a tibble
-college_data <- read.csv(here("Data", "College Study Data.csv")) %>%
-  as_tibble()  # Convert to tibble
+college_data <- read_csv(here("Data", "College Study Data.csv")) 
 
 # Identify potential problems (missing values, column types)
-problems_data <- tibble(
-  column = names(college_data),
-  n_missing = sapply(college_data, function(x) sum(is.na(x))),
-  data_type = sapply(college_data, class)  # Store column data types
-)
-
-# Check the class of the imported data
-class(college_data)
-class(problems_data)
-
-# View results
-college_data
-problems_data
-
-##########
-# Excel #
-##########
-
-# Import the College Study Data from an Excel file into a tibble
-college_data <- read_excel(here("Data", "College Study Data.xlsx")) %>%
-  as_tibble()  # Convert to tibble
-
-# Identify potential problems (missing values, column types)
-problems_data <- tibble(
-  column = names(college_data),
-  n_missing = sapply(college_data, function(x) sum(is.na(x))),
-  data_type = sapply(college_data, class)  # Store column data types
-)
-
-# Check the class of the imported data
-class(college_data)
-class(problems_data)
-
-# View results
-college_data
-problems_data
+college_data_problems <- problems(college_data)
 
 ```
 
@@ -72,24 +36,7 @@ problems_data
 
 ```{r echo=FALSE}
 
-# Identify problematic rows based on missing values
-problematic_rows <- college_data %>%
-  filter(if_any(everything(), is.na)) # Select rows with missing values
-
-# Display problematic rows
-problematic_rows
-
-##########
-# Excel #
-##########
-
-# Display rows with identified problems (rows with any missing values)
-problematic_rows <- college_data %>%
-  filter(if_any(everything(), ~ is.na(.)))  # Filter rows with missing values
-
-class(problems_data)
-
-problematic_rows
+college_data[college_data_problems$row -1, ]
 
 ```
 
@@ -100,31 +47,9 @@ problematic_rows
 
 ```{r echo=FALSE}
 
-# Re-import the original data using read.csv() to preserve raw format (no adjustments)
-original_data <- read.csv(here("Data", "College Study Data.csv"), stringsAsFactors = FALSE)
+college_data_original <- read.csv(here ("Data", "College Study Data.csv"))
 
-# Extract problematic rows from the original data using row indices from the tibble
-problematic_row_indices <- which(rownames(original_data) %in% rownames(problematic_rows))
-
-# Use those indices to extract the problematic rows
-original_problematic_rows <- original_data[problematic_row_indices, ]
-
-# Display the problematic rows from the original data
-original_problematic_rows
-
-##########
-# Excel #
-##########
-
-# Re-import the original data without adjustments, using the basic read_excel()
-original_data <- read_excel(here("Data", "College Study Data.xlsx"), col_names = TRUE)
-
-# Identify rows with missing values in the original data (prior to any adjustments)
-problematic_rows_original <- original_data %>%
-  filter(if_any(everything(), ~ is.na(.)))  # Filter rows with missing values
-
-# Display the problematic rows from the original data
-problematic_rows_original
+college_data_original[college_data_problems$row -1, ]
 
 ```
 
@@ -133,101 +58,43 @@ problematic_rows_original
 
 **4. Compare the two different displays of problem rows. For each row, state what the problem appears to have been and explain how the *read_csv()* function addressed the problem.**
 
-```{r echo=FALSE}
-
-# Compare the problematic rows from both imports
-head(original_problematic_rows)  # Rows from read.csv()
-head(problematic_rows)  # Rows from read_csv() tibble
-
-##########
-# Excel #
-##########
-
-# Identify rows with missing values in the original data (prior to any adjustments)
-problematic_rows_original <- original_data %>%
-  filter(if_any(everything(), ~ is.na(.)))
-
-# Identify rows with missing values in the tibble version of the data
-problematic_rows_tibble <- college_data %>%
-  filter(if_any(everything(), ~ is.na(.)))
-
-# Compare the problematic rows from the original data and the tibble
-problematic_rows_original
-problematic_rows_tibble
-
-```
+For participant ID 7415, it seems a % was entered. Since this is not numeric R is recognizing it as "missing".
+ID 10274 seems to have skipped every value and shifted one variable to the left. It seems that the function
+put missing data for the ID for scale 2. Finally, for ID 12225, the value 4b was entered which resulted in 
+being classified as "missing".
 
 ***
 
 **5. For each problem row, explain whether you agree or disagree with how *read_csv()* handled the issue. Briefly defend each agreement and/or disagreement.**
 
-I agree with how read_excel() handles the data, as it preserves the integrity of the input. However, there are a few areas where automatic adjustments could be handled better, specifically in missing values, column types, and date formats. I mostly disagree with the lack of handling for categorical variables and commas in numbers since the automatic conversion of these would save time and reduce errors in data processing.  
+Starting with ID 7415, we do not have the ability to distinguish whether scale 1 was supposed to be a 5 or something else, so to have this classified as "missing" makes sense. Moving to ID 10274, a better solution would be to shift everything to the right, the issue that could have caused this problem was most likely incorrect data entry. Finally, for ID 12225 this does seem to have been an intended 4 so we will remove the b. 
 
 ***
 
 **6. If you disagreed with any of the solutions used by the *read_csv()* function, change the data in the problem row(s) to what you believe is correct. Show these row(s) when you are done.**
 
-Based on common issues in excel imports the adjustments I would make would consist of:
-
-1.) Missing Data representation: we need to recognize that -99 indicates missing data not NA. 
-
-2.) Data Types for variables:
-- id: numeric or character
-- gender: character 
-- class: chracter 
-- gpa: numeric
-- scale1: numeric
--scale 2: numeric
 
 ```{r echo=FALSE}
-# Re-import the original data without adjustments (assuming the file is Excel)
-original_data <- read_excel(here("Data", "College Study Data.xlsx"), col_names = TRUE)
-
-# Problematic rows (assuming this is already identified)
-problematic_rows <- original_data %>%
-  filter(if_any(everything(), ~ is.na(.)))
-
-# Correcting -99 values as NA
-# Replace -99 with NA for scale1, scale2, and GPA (missing data indicator)
-original_data$gpa[original_data$gpa == -99] <- NA
-original_data$scale1[original_data$scale1 == -99] <- NA
-original_data$scale2[original_data$scale2 == -99] <- NA
-
-# Ensuring proper data types
-# Convert columns to correct data types:
-# Gender and Class should be factors
-original_data$gender <- factor(original_data$gender)
-original_data$class <- factor(original_data$class)
-
-# GPA should be numeric, already handled, but ensure no issues
-original_data$gpa <- as.numeric(original_data$gpa)
-
-# Scale1 and Scale2 should be numeric
-original_data$scale1 <- as.numeric(original_data$scale1)
-original_data$scale2 <- as.numeric(original_data$scale2)
-
-# If any columns contain commas in numeric values, clean them (assuming there could be commas in scale1 or scale2)
-# Remove commas and convert to numeric if necessary (not typical for scales but might be relevant)
-original_data$scale1 <- as.numeric(gsub(",", "", original_data$scale1))
-original_data$scale2 <- as.numeric(gsub(",", "", original_data$scale2))
-
-# Display the corrected rows with missing values
-corrected_problematic_rows <- original_data %>%
-  filter(if_any(everything(), ~ is.na(.)))  # Display rows with missing data
-
-# Show corrected rows
-corrected_problematic_rows
-
+college_data$id[10274] <- 10274
+college_data$gender[10274] <- "male"
+college_data$class[10274] <- "junior"
+college_data$gpa[10274] <- 2.68
+college_data$scale1[10274] <- 3
+college_data$scale2[10274] <- 8
+college_data[10274, ]
 ```
+
+```{r echo=FALSE}
+college_data$scale2[12225] <- 4
+college_data[12225, ]
+```
+
 
 ***
 
 **7. Note the types of data that the parse guesser chose for each variable. Identify which of these are incorrect and briefly explain why these are incorrect.**
 
-```{r echo=FALSE}
-# Check the structure of the imported data
-str(original_data)
-```
+Variables like id, scale1, and scale2 should be classified as "integers" since they do not have any decimal values. On the other hand gpa should be classified as a "double" NOT a "character" because these should all be numeric with decimals. 
 
 ***
 
@@ -236,10 +103,10 @@ str(original_data)
 ```{r echo=FALSE}
 
 # Write the data (from Excel import) to a new CSV file
-write_csv(original_data, here("Data", "Revised_College_Study_Data.csv"))
+write_csv(college_data, here("Data", "college_data_2.csv"))
 
 # Confirm the file is written
-cat("The revised data has been saved as 'Revised_College_Study_Data.csv'.")
+cat("The revised data has been saved as 'college_data_2.csv'")
 
 
 ```
@@ -252,36 +119,20 @@ cat("The revised data has been saved as 'Revised_College_Study_Data.csv'.")
 # Clear the environment
 rm(list = ls())
 
-# Load necessary libraries
-library(readr)
-library(tidyverse)
+college_data <- read_csv(here("Data", "college_data_2.csv"),
+                         col_types = cols(col_integer(),
+                                         col_character(),
+                                         col_character(),
+                                         col_double(),
+                                         col_integer(),
+                                         col_integer()))
 
-# Specify the column types to be used during import
-col_types <- cols(
-  id = col_character(),        # id as character to preserve formatting
-  gender = col_factor(),       # gender as factor
-  class = col_factor(),        # class as factor
-  gpa = col_double(),          # gpa as numeric (double)
-  scale1 = col_double(),       # scale1 as numeric
-  scale2 = col_double()        # scale2 as numeric
-)
+```
 
-# Read the CSV file with the specified column types
-revised_data <- read_csv(here("Data", "Revised_College_Study_Data.csv"), col_types = col_types)
 
-# Check for potential problems (e.g., missing values, incorrect types)
-problems_data <- tibble(
-  column = names(revised_data),
-  n_missing = sapply(revised_data, function(x) sum(is.na(x))),
-  data_type = sapply(revised_data, class)  # Store column data types
-)
+```{r echo=FALSE}
 
-# Check the structure of the imported data to confirm types
-str(revised_data)
-
-# View the problems tibble
-problems_data
-
+college_data_problems <- problems(college_data)
 
 ```
 
@@ -290,36 +141,23 @@ problems_data
 **10. As you did before, compare the problem rows with the original data. For each problem, explain what you believe the problem to be and whether you are satisfied with the solution used by *read_csv()*. If not, state how you propose to fix it.**
 
 ```{r echo=FALSE}
-
-# Identify the rows with problems (missing values or other issues)
-problem_rows <- revised_data[apply(is.na(revised_data), 1, any), ]
-
-# Display the rows with problems
-problem_rows
-
+college_data_original <- read.csv(here ("Data", "College Study Data.csv"))
+college_data_original[college_data_problems$row -1, ]
 ```
+
+```{r echo=FALSE}
+college_data[college_data_problems$row -1, ]
+```
+
+Examining ID 4551, we don't know if this is supposed to be 2.5x (x = integer?) or if it's supposed to be 2.x5. Since we can't differentiate that we will keep it as "missing". Looking at ID 11780, this is definately supposed to be 2.80. 
 
 ***
 
 **11. If you proposed any changes, go ahead an make them and show the result. If not, you can skip this item.**
 
 ```{r echo=FALSE}
-# Fixing the column types and handling missing values
-revised_data <- revised_data %>%
-  # Convert 'id' to character
-  mutate(id = as.character(id),
-         # Convert 'gender' and 'class' to factors
-         gender = factor(gender),
-         class = factor(class),
-         # Handle missing values (if -99 was used as a placeholder for missing)
-         gpa = na_if(gpa, -99),
-         scale1 = na_if(scale1, -99),
-         scale2 = na_if(scale2, -99))
-
-# View the fixed data
-revised_data
-
-
+college_data$gpa[11780] <- 2.80
+college_data[11780, ]
 ```
 
 ***
@@ -327,79 +165,48 @@ revised_data
 **12. Check that the identification numbers have a reasonable range and that they are all unique.**
 
 ```{r echo=FALSE}
-
-# Check if 'id' is numeric and if so, check for reasonable range
-if (is.numeric(revised_data$id)) {
-  min_id <- min(revised_data$id, na.rm = TRUE)
-  max_id <- max(revised_data$id, na.rm = TRUE)
-  cat("ID Range: ", min_id, "to", max_id, "\n")
-} else {
-  cat("ID is not numeric, skipping range check.\n")
-}
-
-# Check for uniqueness of 'id'
-unique_ids <- length(unique(revised_data$id))
-total_rows <- nrow(revised_data)
-cat("Unique IDs: ", unique_ids, "\n")
-cat("Total Rows: ", total_rows, "\n")
-
-# Check if there are any duplicates
-if (unique_ids < total_rows) {
-  cat("Warning: There are duplicate IDs!\n")
-} else {
-  cat("All IDs are unique.\n")
-}
-
-
+min(college_data$id)
 ```
+
+```{r echo=FALSE}
+max(college_data$id)
+```
+
+```{r echo=FALSE}
+length(college_data$id)
+```
+
+It appears that all IDs are unique and range from 1 to the number of rows. 
 
 ***
 
 **13. When these data were collected some time ago, it was common to consider only two gender types. Check that this is the case for these data. If there are inconsistencies, find the offending rows and display them. (Hint: The *table()* function is helpful when studying categorical data.)**
 
 ```{r echo=FALSE}
-
-# Check the distribution of 'gender' values
-gender_table <- table(revised_data$gender)
-print(gender_table)
-
-# Identify rows with inconsistent 'gender' values (those not "male" or "female")
-invalid_gender_rows <- revised_data[!revised_data$gender %in% c("male", "female"), ]
-
-# Display the rows with inconsistent gender values
-invalid_gender_rows
-
+table(college_data$gender)
 ```
 
+```{r echo=FALSE}
+college_data[college_data$gender == "Female", ]
+```
+
+```{r echo=FALSE}
+college_data[college_data$gender == "Male", ]
+```
+
+```{r echo=FALSE}
+college_data[college_data$gender == "senior", ]
+```
 ***
 
 **14. Fix any gender inconsistencies by changing the data in the way you believe makes the most sense. When you are done, display the corrected rows and again check the gender variable.**
 
 ```{r echo=FALSE}
-
-# Check the gender distribution before fixing
-cat("Original gender distribution:\n")
-print(table(revised_data$gender))
-
-# Fixing the gender inconsistencies by correcting common typos
-revised_data$gender <- as.character(revised_data$gender)  # Ensure gender is character
-revised_data$gender[revised_data$gender == "mal"] <- "male"  # Correct "mal" to "male"
-revised_data$gender[revised_data$gender == "fem"] <- "female"  # Correct "fem" to "female"
-
-# Check for any invalid gender entries (other than "male" or "female") and replace with "unknown"
-revised_data$gender[!revised_data$gender %in% c("male", "female")] <- "unknown"
-
-# Find and display rows with the corrected gender
-corrected_gender_rows <- revised_data[revised_data$gender == "unknown", ]
-cat("Corrected gender rows:\n")
-print(corrected_gender_rows)
-
-# Check the gender distribution after fixing
-cat("Corrected gender distribution:\n")
-print(table(revised_data$gender))
-
-
-
+college_data$gender[5513] <- "female"
+college_data$gender[8963] <- "male"
+college_data$gender[3020] <- "female"
+college_data$class[3020] <- "senior"
+college_data[c(5513, 8963, 3020), ] 
 ```
 
 ***
@@ -407,61 +214,48 @@ print(table(revised_data$gender))
 **15. Use a similar procedure to check the *class* variable. If any changes are needed, fix them and then show that you have fixed the problems.**
 
 ```{r echo=FALSE}
-
-# Check the distribution of 'class' values before fixing
-cat("Original class distribution:\n")
-print(table(revised_data$class))
-
-# Fixing the class inconsistencies by correcting common typos
-revised_data$class <- as.character(revised_data$class)  # Ensure class is character
-revised_data$class[revised_data$class == "freshmen"] <- "freshman"  # Correct "freshmen" to "freshman"
-revised_data$class[revised_data$class == "sophmore"] <- "sophomore"  # Correct "sophmore" to "sophomore"
-
-# Check for any invalid class entries (other than known values) and replace with "unknown"
-revised_data$class[!revised_data$class %in% c("freshman", "sophomore", "junior", "senior")] <- "unknown"
-
-# Find and display rows with the corrected class
-corrected_class_rows <- revised_data[revised_data$class == "unknown", ]
-cat("Corrected class rows:\n")
-print(corrected_class_rows)
-
-# Check the class distribution after fixing
-cat("Corrected class distribution:\n")
-print(table(revised_data$class))
-
+table(college_data$class)
 ```
+
+```{r echo=FALSE}
+college_data$class[college_data$class == "junirr"] <- "junior"
+college_data$class[college_data$class == "SENIOR"] <- "senior"
+table(college_data$class)
+```
+
 
 ***
 
 **16. Check the range of the GPA variable. If any of the rows are out of range, decide how to fix each row so that you no longer have out of range data.**
 
 ```{r echo=FALSE}
-# Check the class of the GPA column
-cat("Class of GPA column:\n")
-print(class(revised_data$gpa))
+min(college_data$gpa, na.rm = TRUE)
+```
 
-# Check for any non-numeric entries in GPA (e.g., text or special characters)
-cat("Check for non-numeric entries in GPA:\n")
-unique(revised_data$gpa)
+```{r echo=FALSE}
+max(college_data$gpa, na.rm = TRUE)
+```
 
-# Identify rows with non-numeric GPA values
-non_numeric_gpa <- revised_data[!grepl("^\\d*(\\.\\d+)?$", revised_data$gpa), ]
-cat("Rows with non-numeric GPA values:\n")
-print(non_numeric_gpa)
+This is not correct it should have a max of 4.00, so now I will find the GPAs above 4.00. 
 
-# Remove any non-numeric entries from the GPA column (replace them with NA)
-revised_data$gpa <- as.character(revised_data$gpa)
-revised_data$gpa[!grepl("^\\d*(\\.\\d+)?$", revised_data$gpa)] <- NA
+```{r echo=FALSE}
+college_data$gpa[college_data$gpa > 4.00 & !is.na(college_data$gpa)]
+```
 
-# Now, convert the GPA column to numeric
-revised_data$gpa <- as.numeric(revised_data$gpa)
+Since we don't know what this GPA is actually supposed to be we will have to treat it as missing. 
 
-# Check the range of the GPA variable again
-cat("GPA range after cleaning:\n")
-gpa_range_fixed <- range(revised_data$gpa, na.rm = TRUE)
-print(gpa_range_fixed)
+```{r echo=FALSE}
+college_data$gpa[college_data$gpa > 4.00 & !is.na(college_data$gpa)] <- NA
+```
 
+Now lets double check the GPA range again.
 
+```{r echo=FALSE}
+min(college_data$gpa, na.rm = TRUE)
+```
+
+```{r echo=FALSE}
+max(college_data$gpa, na.rm = TRUE)
 ```
 
 ***
@@ -469,33 +263,14 @@ print(gpa_range_fixed)
 **17. Check the scale1 variable and make changes if there are any issues. (Hint: Even though this variable is an integer, there are only five values so that the *table()* function may again prove useful.)**
 
 ```{r echo=FALSE}
+table(college_data$scale1)
+```
 
-# Check the distribution of values in scale1
-cat("Scale1 value distribution:\n")
-scale1_distribution <- table(revised_data$scale1)
-print(scale1_distribution)
+We can see that someone put in -99 as missing, which will need to be changed and checked. 
 
-# Identify rows with values outside the expected range (1 to 5)
-invalid_scale1 <- revised_data[revised_data$scale1 < 1 | revised_data$scale1 > 5, ]
-
-# Display rows with invalid values
-cat("Rows with invalid scale1 values:\n")
-print(invalid_scale1)
-
-# Fix invalid scale1 values by setting them to NA (or another strategy if necessary)
-revised_data$scale1[revised_data$scale1 < 1 | revised_data$scale1 > 5] <- NA
-
-# Recheck the distribution of scale1 after fixing
-cat("Revised Scale1 value distribution:\n")
-scale1_distribution_fixed <- table(revised_data$scale1)
-print(scale1_distribution_fixed)
-
-# Display rows with NA in scale1 (which were invalid)
-invalid_scale1_fixed <- revised_data[is.na(revised_data$scale1), ]
-cat("Rows with fixed scale1 values (now NA):\n")
-print(invalid_scale1_fixed)
-
-
+```{r echo=FALSE}
+college_data$scale1[college_data$scale1 == -99] <- NA
+table(college_data$scale1)
 ```
 
 ***
@@ -503,31 +278,21 @@ print(invalid_scale1_fixed)
 **18. Use similar methods to check the scale2 variable and make changes if there are any issues.**
 
 ```{r echo=FALSE}
+table(college_data$scale2)
+```
 
-# Check the class of the scale2 variable
-cat("Class of scale2 variable:\n")
-print(class(revised_data$scale2))
+-99 was used as missing, but there are still errors. 
 
-# Inspect unique values in scale2 to identify any unexpected entries
-cat("Unique values in scale2 before cleaning:\n")
-print(unique(revised_data$scale2))
+```{r echo=FALSE}
+college_data$scale2[college_data$scale2 < 0] <- NA
+table(college_data$scale2)
+```
 
-# If scale2 is not numeric, we will convert it to numeric
-revised_data$scale2 <- as.character(revised_data$scale2)  # Convert to character to inspect
-revised_data$scale2[!revised_data$scale2 %in% c("1", "2", "3", "4", "5", "6", "7", "8", "9")] <- NA  # Replace non-1-9 values with NA
-revised_data$scale2 <- as.numeric(revised_data$scale2)  # Convert back to numeric
+Since we don't know what 12 really is we will make it as missing. 
 
-# Check the distribution of values in scale2 again
-cat("Scale2 value distribution after cleaning:\n")
-scale2_distribution <- table(revised_data$scale2)
-print(scale2_distribution)
-
-# Identify rows with NA values in scale2 after cleaning
-invalid_scale2_fixed <- revised_data[is.na(revised_data$scale2), ]
-cat("Rows with invalid scale2 values (now NA):\n")
-print(invalid_scale2_fixed)
-
-
+```{r echo=FALSE}
+college_data$scale2[college_data$scale2 == 12 & !is.na(college_data$scale2)] <- NA
+table(college_data$scale2)
 ```
 
 ***
@@ -535,29 +300,16 @@ print(invalid_scale2_fixed)
 **19. Even though you already specified the class of each variable when you read in the data, check these again to make sure they are ready for analysis. (Hint: You may have cleaned up character data for variables that can now become factors.)**
 
 ```{r echo=FALSE}
+head(college_data)
+```
 
-# Check the class of each variable in the dataset
-cat("Classes of each variable in the dataset:\n")
-print(sapply(revised_data, class))
+Some of these variables need to be change/corrected. 
 
-# Convert gender and class variables to factors if they are not already
-revised_data$gender <- as.factor(revised_data$gender)
-revised_data$class <- as.factor(revised_data$class)
-
-# Check if GPA, scale1, and scale2 are numeric (if not, convert them)
-revised_data$gpa <- as.numeric(revised_data$gpa)
-revised_data$scale1 <- as.numeric(revised_data$scale1)
-revised_data$scale2 <- as.numeric(revised_data$scale2)
-
-# Check the updated class of each variable after conversion
-cat("Updated classes of each variable:\n")
-print(sapply(revised_data, class))
-
-# Check for any NAs or issues after conversion
-cat("Summary of the dataset after type conversion:\n")
-print(summary(revised_data))
-
-
+```{r echo=FALSE}
+college_data$id <- factor(college_data$id)
+college_data$gender <- factor(college_data$gender)
+college_data$class <- factor(college_data$class)
+head(college_data)
 ```
 
 ***
@@ -565,10 +317,22 @@ print(summary(revised_data))
 **20. Write your data to a file entitled *College Study Data (Clean).csv*.**
 
 ```{r echo=FALSE}
-
 # Save the cleaned data to a new CSV file
-write.csv(revised_data, "College Study Data (Clean).csv", row.names = FALSE)
+write.csv(college_data, here("Data", "College Study Data (Clean).csv"))
+```
 
+Now lets clear the environment and use the college data function to check the cleaned data. 
+
+```{r echo=FALSE}
+rm(list = ls())
+
+source(here("Functions", "College Data Check.R"))
+
+clean_college_data <- read_csv(here("Data", "College Study Data (Clean).csv"))
+```
+
+```{r echo=FALSE}
+College_Data_Check(clean_college_data)
 ```
 
 ***
