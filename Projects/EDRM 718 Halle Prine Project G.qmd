@@ -5,20 +5,39 @@ format: html
 editor: visual
 ---
 
-```{r include=FALSE}
-install.packages("jsonlite")
-install.packages("gt")
-rm(list = ls())
-library(here)
-library(tidyverse)
-library(httr)
-library(jsonlite)
-library(readr)
-library(ggplot2)
-library(dplyr)
-library(gt)
-library(Hmisc)
+## Who's the Happiest of Them All? A Data Dive into Work, Income, and Mental Health
 
+Research Question: What are the strongest predictors of self-reported happiness among U.S. **Allegheny County**? Specifically, we examine whether depression levels (PHQ-2), income brackets, and work status are associated with composite happiness scores. We hypothesis that work status may be a primary predictor followed by income and mental health for general perceived happiness.
+
+***Data Source*****:** University of Pittsburgh Center for Social and Urban Research (WPRDC, 2015)
+
+***Variables Used*****:**
+
+-   Happiness score (happy1 + happy2; scale: 1-20)
+
+-   Work status (Currently working, Not working)
+
+-   Income bracket (\<\$10k to \>\$100k)
+
+-   PHQ-2 Depression score & categories
+
+-   Age, education, sex, marital status
+
+-   Race (derived from dummy variables)
+
+```{r include=FALSE, echo = FALSE}
+# install.packages("gtsummary")
+# install.packages("kableExtra")
+
+library(kableExtra)
+library(httr)
+library(tidyverse)
+library(ggplot2)
+library(emmeans)
+library(psych)
+library(corrr)
+library(gtsummary)
+library(Hmisc)
 
 # URL for the survey results CSV
 survey_data_url <- "https://data.wprdc.org/dataset/33891263-235f-4c6c-af8a-c79b0114a9f9/resource/c29c46fe-5bf7-431a-9c1c-a9e2e4e81eff/download/ucsur-soa-data-for-distribution-2015-oct-14.csv"
@@ -37,332 +56,210 @@ if (status_code(response) == 200) {
   stop("Failed to download data: HTTP status ", status_code(response))
 }
 
-```
-
-```{r include=FALSE}
-# View first few rows
-head(survey_data)
-
-# Quick summary
-summary(survey_data)
-
-# Check variable names
-names(survey_data)
-```
-
-Research Question: Is happiness associated with work status among older adults in Allegheny County?
-
-```{r include=FALSE}
-
-# Recode work1 into a readable factor
-survey_data <- survey_data %>%
-  mutate(work_status = factor(work1,
-                              levels = c(1, 2),
-                              labels = c("Currently working", "Not working")))
-
-# Plot happiness by work status
-ggplot(filter(survey_data, !is.na(work_status)), aes(x = work_status, y = happy1)) +
-  geom_boxplot(fill = "lightblue") +
-  labs(title = "Happiness by Work Status",
-       x = "Work Status",
-       y = "Happiness Rating (1–10)")
-
-
-survey_data %>%
-  filter(!is.na(work_status), !is.na(happy1)) %>%
-  group_by(work_status) %>%
-  summarise(
-    n = n(),
-    mean_happiness = round(mean(happy1, na.rm = TRUE), 2),
-    sd_happiness = round(sd(happy1, na.rm = TRUE), 2)
-  ) %>%
-  gt() %>%
-  tab_header(
-    title = "Happiness Summary by Work Status"
-  )
-
-
-
-# Scatter plot
-
-# Remove extreme values in happy1 (e.g., > 10)
-survey_data_clean <- survey_data %>%
-  filter(happy1 <= 10)
-
-ggplot(filter(survey_data_clean, !is.na(work_status)), aes(x = work_status, y = happy1)) +
-  geom_boxplot(fill = "lightblue") +
-  labs(title = "Happiness by Work Status (Outliers Removed)",
-       x = "Work Status", y = "Happiness Rating (1–10)")
-
-ggplot(filter(survey_data_clean, !is.na(work_status)), aes(x = happy1, fill = work_status)) +
-  geom_density(alpha = 0.5) +
-  labs(title = "Distribution of Happiness by Work Status",
-       x = "Happiness Rating", y = "Density") +
-  theme_minimal()
-
-
-# t.test
-
-t.test(happy1 ~ work_status, data = survey_data_clean)
-
-
-# grphing these confidence intervals
-
-# Summarize means and CIs
-ci_summary <- survey_data_clean %>%
-  group_by(work_status) %>%
-  summarise(
-    n = n(),
-    mean_happy = mean(happy1, na.rm = TRUE),
-    sd_happy = sd(happy1, na.rm = TRUE),
-    se = sd_happy / sqrt(n),
-    ci_lower = mean_happy - qt(0.975, df = n - 1) * se,
-    ci_upper = mean_happy + qt(0.975, df = n - 1) * se
-  )
-
-# scatter Ploting the confidence intervals
-
-
-# Calculate group means and 95% CIs
-ci_summary <- survey_data_clean %>%
-  group_by(work_status) %>%
-  summarise(
-    n = n(),
-    mean_happy = mean(happy1, na.rm = TRUE),
-    sd_happy = sd(happy1, na.rm = TRUE),
-    se = sd_happy / sqrt(n),
-    ci_lower = mean_happy - qt(0.975, df = n - 1) * se,
-    ci_upper = mean_happy + qt(0.975, df = n - 1) * se
-  )
-
-# Plot as scatter with error bars
-ggplot(ci_summary, aes(x = work_status, y = mean_happy)) +
-  geom_point(size = 4, color = "blue") +
-  geom_errorbar(aes(ymin = ci_lower, ymax = ci_upper), width = 0.15, color = "blue") +
-  labs(
-    title = "Mean Happiness by Work Status (with 95% CI)",
-    x = "Work Status",
-    y = "Mean Happiness Rating"
-  ) +
-  theme_minimal()
-
-
-# possible linear regression between work and happiness
-model <- lm(happy1 ~ work1 + age + income + educ + PHQ2 + sex + marstat, data = survey_data_clean)
-summary(model)
-
-
-# New TOPIC QUESTION
-install.packages("corrr")
-library(corrr)
-
-survey_data_clean %>%
-  select(happy1, PHQ2, income, age, educ) %>%
-  correlate() %>%
-  fashion()
-
-model <- lm(happy1 ~ work1 + income + PHQ2 + age + educ + sex + marstat, data = survey_data_clean)
-summary(model)
-
-
-ggplot(survey_data_clean, aes(x = PHQ2, y = happy1)) +
-  geom_jitter(alpha = 0.3, width = 0.2) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
-  labs(title = "Happiness by Depression Score",
-       x = "PHQ2 Score", y = "Happiness")
-
-ggplot(survey_data_clean, aes(x = income, y = happy1)) +
-  geom_jitter(alpha = 0.3, width = 0.2) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
-  labs(title = "Happiness by Depression Score",
-       x = "Income", y = "Happiness")
-
-ggplot(survey_data_clean, aes(x = work1, y = happy1)) +
-  geom_jitter(alpha = 0.3, width = 0.2) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkred") +
-  labs(title = "Happiness by Depression Score",
-       x = "Work", y = "Happiness")
-
-
-```
-
-```{r include=FALSE}
-
-table(survey_data_clean$work1, useNA = "always")
-
-
-survey_data_clean <- survey_data_clean %>%
-  filter(work1 %in% c(1, 2)) %>%  # keep only working and not working
-  mutate(
-    work1 = factor(work1, levels = c(1, 2),
-                   labels = c("Currently working", "Not working"))
-  )
-
-
-survey_data_clean <- survey_data_clean %>%
-  mutate(
-    income = factor(income, levels = 1:8, ordered = TRUE,
-                    labels = c(
-                      "<$10k", "$10–20k", "$20–30k", "$30–40k",
-                      "$40–50k", "$50–75k", "$75–100k", ">$100k"))
-  )
-
-
-survey_data_clean <- survey_data_clean %>%
-  mutate(
-    phq_cat = case_when(
-      PHQ2 <= 2 ~ "None to mild",
-      PHQ2 <= 4 ~ "Moderate",
-      PHQ2 >= 5 ~ "Severe"
-    ) %>% factor(levels = c("None to mild", "Moderate", "Severe"))
-  )
-
-
-model_factor <- lm(happy1 ~ work1 + income + phq_cat + age + educ + sex + marstat, data = survey_data_clean)
-summary(model_factor)
-
-
-
-# plots
-
-ggplot(survey_data_clean, aes(x = PHQ2, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3) +
-  geom_smooth(method = "lm", se = TRUE, color = "firebrick", fill = "pink") +
-  labs(title = "Happiness by Depression (PHQ2)",
-       x = "PHQ2 Score (Depression Symptoms)",
-       y = "Happiness Rating (1–10)") +
-  theme_minimal()
-
-ggplot(survey_data_clean, aes(x = income, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3) +
-  geom_smooth(method = "lm", se = TRUE, color = "steelblue", fill = "lightblue") +
-  labs(title = "Happiness by Income",
-       x = "Income Bracket",
-       y = "Happiness Rating (1–10)") +
-  theme_minimal()
-
-ggplot(survey_data_clean, aes(x = work1, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3) +
-  geom_smooth(method = "lm", se = TRUE, color = "darkgreen", fill = "lightgreen") +
-  labs(title = "Happiness by Work Status",
-       x = "Work Status",
-       y = "Happiness Rating (1–10)") +
-  theme_minimal()
-
-ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
-  geom_boxplot(fill = "lightpink") +
-  stat_summary(fun = mean, geom = "point", shape = 18, size = 3, color = "darkred") +
-  labs(title = "Happiness by Depression Category",
-       x = "Depression Level",
-       y = "Happiness Rating (1–10)") +
-  theme_minimal()
-
-ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3, color = "gray40") +
-  stat_summary(fun = mean, geom = "point", shape = 18, size = 4, color = "darkred") +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.15, color = "darkred") +
-  labs(
-    title = "Happiness by Depression Category (PHQ-2)",
-    x = "Depression Level",
-    y = "Happiness Rating (1–10)"
-  ) +
-  theme_minimal()
-
-
-```
-
-
-
-```{r include=FALSE}
-# Load libraries
-library(tidyverse)
-library(ggplot2)
-library(emmeans)
-library(psych)
-library(corrr)
-
 # Clean and prepare data
 survey_data_clean <- survey_data %>%
   filter(work1 %in% c(1, 2)) %>%
   mutate(
+    happy_score = happy1 + happy2,
     work1 = factor(work1, levels = c(1, 2),
                    labels = c("Currently working", "Not working")),
     income = factor(income, levels = 1:8, ordered = TRUE,
                     labels = c("<$10k", "$10–20k", "$20–30k", "$30–40k",
                                "$40–50k", "$50–75k", "$75–100k", ">$100k")),
-    phq_cat = case_when(
-      PHQ2 <= 2 ~ "None to mild",
+    depression = case_when(
+      PHQ2 <= 2 ~ "Mild",
       PHQ2 <= 4 ~ "Moderate",
       PHQ2 >= 5 ~ "Severe"
-    ) %>% factor(levels = c("None to mild", "Moderate", "Severe"))
+    ) %>% factor(levels = c("Mild", "Moderate", "Severe")),
+    race = case_when(
+      race_1 == 1 ~ "White",
+      race_2 == 1 ~ "Black or African American",
+      race_3 == 1 ~ "American Indian or Alaska Native",
+      race_4 == 1 ~ "Asian",
+      race_5 == 1 ~ "Native Hawaiian or Pacific Islander",
+      race_6 == 1 ~ "Other",
+      race_7 == 1 ~ "Multiple Races",
+      TRUE ~ NA_character_
+    ) %>% factor(),
+    sex = factor(sex, levels = c(1, 2), labels = c("Male", "Female"))
   )
 
-# Descriptive statistics of key variables
-describe(survey_data_clean %>% select(happy1, PHQ2, age, sex, educ, income))
 
-ggplot(survey_data_clean, aes(x = happy1)) +
-  geom_histogram(binwidth = 1, fill = "lightblue", color = "black") +
-  labs(title = "Distribution of Happiness Ratings") +
-  theme_minimal()
+# Check the happy score
+summary(survey_data_clean$happy_score)
+survey_data_clean <- survey_data_clean %>%
+  filter(happy_score >= 2, happy_score <= 20)
+```
 
-# Correlation table of numeric predictors
-survey_data_clean %>%
-  select(happy1, PHQ2, age, educ) %>%
-  correlate() %>%
-  fashion()
+The sample consisted of 1,001 older adults (mean age: 79), predominantly White females. Among them, 702 individuals reported that they are currently not working. Of those who are working, the majority reported an annual income in the \$10–20K range, while most non-working individuals indicated an income below \$10K (Table 1)
 
-# Linear regression model
-model <- lm(happy1 ~ work1 + income + phq_cat + age + educ + sex + marstat,
-            data = survey_data_clean)
-summary(model)
+***Table 1***. Sample Demographics
 
-# PHQ2 category plot with jitter and confidence intervals
-ggplot(survey_data_clean, aes(x = phq_cat, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3, color = "gray40") +
-  stat_summary(fun = mean, geom = "point", shape = 18, size = 4, color = "darkred") +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", width = 0.15, color = "darkred") +
+```{r echo = FALSE}
+# Neat table of summary statistics (no p-values)
+tbl_summary(
+  survey_data_clean %>% select(happy_score, age, educ, income, work1, depression, race, sex),
+  by = work1,
+  statistic = list(all_continuous() ~ "{mean} ({sd})",
+                   all_categorical() ~ "{n} ({p}%)")
+) %>%
+  add_n() %>%
+  bold_labels()
+```
+
+## Stacked Bar graphs
+
+The first stacked bar chart shows the proportion of individuals in each depression category (Mild, Moderate, Severe), split by work status (Currently working vs Not working) (Figure 1 and Table 2). We see that majority of both groups fall under the "mild" depression category (light red). Those who are not working shows slightly higher proportions of "moderate" and "severe" depression (green and blue). This any suggest an association between employment and lower depression severity.
+
+***Figure 2***. Stacked Bar Plot of Depression Levels and Work Status
+
+```{r echo = FALSE}
+# PHQ Category by Work Status (remove NAs)
+ggplot(filter(survey_data_clean, !is.na(work1) & !is.na(depression)), 
+       aes(x = work1, fill = depression)) +
+  geom_bar(position = "fill") +
   labs(
-    title = "Happiness by Depression Category (PHQ-2)",
-    x = "Depression Level",
-    y = "Happiness Rating (1–10)"
-  ) +
-  theme_minimal()
-
-# Income vs happiness plot
-ggplot(survey_data_clean, aes(x = income, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3) +
-  geom_smooth(method = "lm", se = TRUE, color = "steelblue", fill = "lightblue") +
-  labs(
-    title = "Happiness by Income",
-    x = "Income Bracket",
-    y = "Happiness Rating (1–10)"
-  ) +
-  theme_minimal()
-
-# Work status vs happiness (jitter + mean + CI)
-summary_stats <- survey_data_clean %>%
-  group_by(work1) %>%
-  summarize(
-    mean_happy = mean(happy1, na.rm = TRUE),
-    se = sd(happy1, na.rm = TRUE) / sqrt(n()),
-    n = n()
-  ) %>%
-  mutate(
-    ci_lower = mean_happy - 1.96 * se,
-    ci_upper = mean_happy + 1.96 * se
-  )
-
-ggplot(survey_data_clean, aes(x = work1, y = happy1)) +
-  geom_jitter(width = 0.2, alpha = 0.3, color = "gray40") +
-  geom_point(data = summary_stats, aes(y = mean_happy), size = 4, color = "darkgreen") +
-  geom_errorbar(data = summary_stats, aes(ymin = ci_lower, ymax = ci_upper), width = 0.15, color = "darkgreen") +
-  labs(
-    title = "Happiness by Work Status",
+    title = "Distribution of Depression Levels by Work Status",
     x = "Work Status",
-    y = "Happiness Rating (1–10)"
+    y = "Proportion",
+    fill = "Depression Categories"
   ) +
+  scale_y_continuous(labels = scales::percent) +
   theme_minimal()
 
 ```
 
+***Table 2***. Frequency Table of Depression Scales
 
+```{r echo = FALSE}
+table(survey_data_clean$depression)
+```
+
+The next stacked bar graph examined income bracket proportions within each depression level category (Figure 3 and Table 3). We see that individuals with *mild* depression are more represented in higher income brackets (i.e., \$50-75K, \>\$100K). Those with *moderate* and *severe* depression appear more concentrated in the lower income brackets (especially \<\$10K and \$10-20K). The gradient implies a potential inverse relationship between income level and depression severity.
+
+***Figure 3.*** Stacked Bar Plot of Depression Levels and Income
+
+```{r echo = FALSE}
+# Income by PHQ Category (remove NAs)
+ggplot(filter(survey_data_clean, !is.na(income) & !is.na(depression)), 
+       aes(x = depression, fill = income)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "Income Brackets Across Depression Levels",
+    x = "Depression Level",
+    y = "Proportion",
+    fill = "Income Bracket"
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+```
+
+***Table 3***. Frequency Table of Income
+
+```{r echo = FALSE}
+table(survey_data_clean$income)
+```
+
+Finally, we have the stacked bar plot examining the racial breakdown (as a proportion) within each depression level (Figure 4 and Table 4). Examining these plots we see that white individuals (pink) make up the largest racial groups across all levels of depression. There is a greater racial diversity (i.e., higher proportion of Black, Asian, and other races) observed in the "severe" depression category than in "mild". This suggests that while the sample is predominantly white, race may intersect with mental health disparities in nuanced ways.
+
+***Figure 4***. Stacked Bar Plot of Depression Levels and Race
+
+```{r echo = FALSE}
+# Race by PHQ Category (remove NAs)
+ggplot(filter(survey_data_clean, !is.na(race) & !is.na(depression)), 
+       aes(x = depression, fill = race)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "Racial Composition Across Depression Levels",
+    x = "Depression Level",
+    y = "Proportion",
+    fill = "Race"
+  ) +
+  scale_y_continuous(labels = scales::percent) +
+  theme_minimal()
+```
+
+***Table 4***. Frequency Table of Race
+
+```{r echo = FALSE}
+table(survey_data_clean$race)
+```
+
+# Correlations
+
+The correlation analysis revealed several notable relationships among the study variables (Table 5). Happiness was negatively correlated with depression scores (r = -0.16, p \< .001), indicating that higher levels of depressive symptoms were associated with lower happiness scores. Income was positively correlated with happiness (r = 0.18, p \< .001), suggesting that individuals with higher income levels reported greater happiness. Age showed a small but significant positive correlation with education (r = 0.12, p \< .001), and income was also positively associated with education (r = 0.08, p = .013). Interestingly, depression scores were negatively correlated with income (r = -0.16, p \< .001), further supporting the link between financial stability and mental well-being. Race and happiness were not significantly correlated, and race showed only weak associations with other variables. These findings reinforce the importance of both mental health and socioeconomic factors in shaping perceived happiness.
+
+***Table 5***. Correlation Matrix
+
+```{r include=FALSE, echo = FALSE}
+# Convert categorical variables to numeric for correlation
+cor_data <- survey_data_clean %>%
+  mutate(
+    income_num = as.numeric(income),
+    race_num = as.numeric(race)
+  ) %>%
+  select(happy_score, PHQ2, age, educ, income_num, race_num)
+
+# Calculate correlation and p-values
+cor_results <- rcorr(as.matrix(cor_data))
+
+# Update variable names for labeling clarity
+colnames(cor_results$r) <- colnames(cor_results$P) <- c(
+  "Happiness", "PHQ2", "Age", "Education", "Income", "Race"
+)
+
+# Format r with significance stars
+format_r_p <- function(r, p) {
+  stars <- ifelse(p < 0.001, "***",
+           ifelse(p < 0.01, "**",
+           ifelse(p < 0.05, "*", "")))
+  paste0(round(r, 2), stars, " (", signif(p, 2), ")")
+}
+
+# Build lower triangle of matrix
+triangle_corr <- matrix("", nrow = ncol(cor_results$r), ncol = ncol(cor_results$r))
+rownames(triangle_corr) <- colnames(triangle_corr) <- colnames(cor_results$r)
+
+for (i in 2:ncol(cor_results$r)) {
+  for (j in 1:(i - 1)) {
+    triangle_corr[i, j] <- format_r_p(cor_results$r[i, j], cor_results$P[i, j])
+  }
+}
+
+# Convert to data frame
+triangle_df <- data.frame(Variable = rownames(triangle_corr), triangle_corr)
+triangle_df <- triangle_df[, c(TRUE, colSums(triangle_df != "") > 0)]  # remove empty columns
+
+# Add 1s to diagonal
+for (i in 1:nrow(triangle_df)) {
+  triangle_df[i, i + 1] <- "1"
+}
+
+# Display correlation table nicely
+kable(triangle_df[, -1],
+      caption = "Correlation Matrix Between Variables") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+# Linear regression
+
+The multiple regression analysis revealed that depression level was the most robust predictor of self-reported happiness (Table 6). Compared to those with mild symptoms, individuals with moderate depression reported happiness scores nearly 2.3 points lower, while those with severe depression were over 6.5 points lower, both statistically significant at p \< .001. Income showed a weak linear trend, with higher brackets modestly associated with greater happiness (p = .075), though other non-linear income effects were not significant. Being female was also associated with slightly higher happiness (β = 0.54, p = .03). In contrast, work status, age, education, marital status, and race were not significant predictors after controlling for other variables. Overall, the model explained approximately 16% of the variance in happiness scores (R² = 0.158), underscoring the strong role of mental health—particularly depressive symptoms—as a key factor in subjective well-being.
+
+***Table 6***. Linear Regression Model Predicting Self-reported Happiness
+
+```{r include=FALSE, echo = FALSE}
+# Linear regression model including race
+model <- lm(happy_score ~ work1 + income + depression + age + educ + sex + marstat + race,
+            data = survey_data_clean)
+summary(model)
+
+# Create a nice table
+tbl_regression(model, intercept = TRUE) %>%
+  bold_labels() %>%
+  modify_header(label = "**Predictor**") %>%
+  modify_caption("**Linear Regression Predicting Happiness Score**")
+```
+
+# Conclusions
+
+This analysis highlights depression as the strongest predictor of self-reported happiness among older adults. Even after controlling for socioeconomic variables such as income and work status, individuals with moderate and severe depressive symptoms reported significantly lower happiness scores. While income showed a modest positive association with happiness, its effects were relatively small in comparison. Interestingly, work status and education did not significantly predict happiness once mental health and other factors were accounted for. These findings suggest that interventions targeting mental health—particularly depression—may be more impactful for improving subjective well-being than employment or income-focused efforts alone. Investing in accessible, community-based mental health resources could play a critical role in enhancing overall life satisfaction for aging populations.
