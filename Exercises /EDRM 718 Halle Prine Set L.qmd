@@ -1,6 +1,8 @@
 ---
 title: "EDRM 718 Exercise Set L"
+author: "Halle Prine"
 format: html
+knitr::opts_knit$set(root.dir = "/Users/halleprine/Desktop/GitREPO/EDRM 718 HP - Spring")
 ---
 
 *Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Twelve points per item)*
@@ -20,16 +22,97 @@ You may use both the tidyverse and Base R to complete these tasks.
 
 **1. Tidy the *messy_sales.csv* file.**
 
+```{r include=FALSE}
+# Load necessary libraries
+library(readr)
+library(here)
+library(tidyverse)
+
+sales <- read_csv(here("Data", "messy_sales.csv")) 
+sales
+
+tidy.sales <- sales %>%
+  pivot_longer(
+    cols = starts_with("20"),    # selects 2020_Sales to 2023_Sales
+    names_to = "Year",
+    names_prefix = "X|_|Sales",  # handles "2020_Sales" or "X2020_Sales"
+    values_to = "Sales"
+  ) %>%
+  mutate(Year = str_remove(Year, "_Sales"))  # Clean "2020_Sales" to just "2020"
+
+tidy.sales
+
+write_csv(tidy.sales, here("Data", "tidy_sales.csv"))
+```
+
 ***
 
 **2. Tidy the *messy_weather.csv* file.**
+
+```{r include=FALSE}
+weather <- read_csv(here("Data", "messy_weather.csv")) 
+weather
+
+# Making sure data is a date
+weather$Date <- as.Date(weather$Date, format = "%m/%d/%Y")
+
+# Making implicit missing data into explicit 
+tidy.weather <- weather %>%
+  complete(Location, Date)
+
+
+tidy.weather
+
+write_csv(tidy.weather, here("Data", "tidy_weather.csv"))
+
+```
 
 ***
 
 **3. Tidy the *messy_survey.csv* file.**
 
+```{r include=FALSE}
+survey <- read_csv(here("Data", "messy_survey.csv")) 
+survey
+
+# Separate the 'Responses' column into multiple color columns
+tidy.survey <- survey %>%
+  separate(Responses,
+           into = c("Color_1", "Color_2", "Color_3", "Color_4"),
+           sep = ";",
+           fill = "right")  # fill with NA when fewer than 4 colors
+
+tidy.survey
+
+write_csv(tidy.survey, here("Data", "tidy_survey.csv"))
+
+```
+
 ***
 
 **4. Tidy the *messy_patients.csv* file.**
+
+```{r include=FALSE}
+patients <- read_csv(here("Data", "messy_patients.csv")) 
+patients
+
+patients %>%
+  gather('TreatmentA_Day1', 'TreatmentA_Day2', 'TreatmentA_Day3', 'TreatmentB_Day1', 'TreatmentB_Day2', 'TreatmentB_Day3',
+         key = "Treatment",
+         value = "Count")
+
+patients %>%
+  pivot_longer(cols = -ID, names_to = "Treatment", values_to = "Count") %>%
+  separate(Treatment, into = c("Group", "Day"), sep = "_Day")
+
+tidy.patients <- tidy.patients %>%
+  mutate(Day = as.double(Day))
+
+
+tidy.patients
+
+write_csv(tidy.patients, here("Data", "tidy_patients.csv"))
+
+```
 
 ***
