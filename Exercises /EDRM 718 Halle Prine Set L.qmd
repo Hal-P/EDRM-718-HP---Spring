@@ -1,0 +1,35 @@
+---
+title: "EDRM 718 Exercise Set L"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Twelve points per item)*
+
+***
+
+These exercises are about tidying data. For each data set, take four steps.
+
+1. Import the data.
+2. Tidy the data. Make any missing data explicit.
+3. Write the tidy data into the data folder in a file with the same name except replacing the word *messy* with *tidy* in the file name.
+4. Print the data so that the knit version will show the complete tidy data set.
+
+You may use both the tidyverse and Base R to complete these tasks.
+
+***
+
+**1. Tidy the *messy_sales.csv* file.**
+
+***
+
+**2. Tidy the *messy_weather.csv* file.**
+
+***
+
+**3. Tidy the *messy_survey.csv* file.**
+
+***
+
+**4. Tidy the *messy_patients.csv* file.**
+
+***
