@@ -2,7 +2,6 @@
 title: "EDRM 718 Exercise Set L"
 author: "Halle Prine"
 format: html
-knitr::opts_knit$set(root.dir = "/Users/halleprine/Desktop/GitREPO/EDRM 718 HP - Spring")
 ---
 
 *Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Twelve points per item)*
@@ -40,7 +39,7 @@ tidy.sales <- sales %>%
   ) %>%
   mutate(Year = str_remove(Year, "_Sales"))  # Clean "2020_Sales" to just "2020"
 
-tidy.sales
+print(tidy.sales, n = Inf)
 
 write_csv(tidy.sales, here("Data", "tidy_sales.csv"))
 ```
@@ -58,10 +57,12 @@ weather$Date <- as.Date(weather$Date, format = "%m/%d/%Y")
 
 # Making implicit missing data into explicit 
 tidy.weather <- weather %>%
-  complete(Location, Date)
+  gather('Morning_Temp', 'Afternoon_Temp', 
+         key = "Time_of_Day",
+         value = "Time" )
+  complete(Location, Date, Time_of_Day)
 
-
-tidy.weather
+print(tidy.weather, n = Inf)
 
 write_csv(tidy.weather, here("Data", "tidy_weather.csv"))
 
@@ -82,7 +83,7 @@ tidy.survey <- survey %>%
            sep = ";",
            fill = "right")  # fill with NA when fewer than 4 colors
 
-tidy.survey
+print(tidy.survey, n = Inf)
 
 write_csv(tidy.survey, here("Data", "tidy_survey.csv"))
 
@@ -93,6 +94,7 @@ write_csv(tidy.survey, here("Data", "tidy_survey.csv"))
 **4. Tidy the *messy_patients.csv* file.**
 
 ```{r include=FALSE}
+#| paged-print: false
 patients <- read_csv(here("Data", "messy_patients.csv")) 
 patients
 
@@ -109,7 +111,7 @@ tidy.patients <- tidy.patients %>%
   mutate(Day = as.double(Day))
 
 
-tidy.patients
+print(tidy.patients, n = Inf)
 
 write_csv(tidy.patients, here("Data", "tidy_patients.csv"))
 

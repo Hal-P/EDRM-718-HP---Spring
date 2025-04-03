@@ -1,0 +1,290 @@
+---
+title: "EDRM 718 Exercise Set M"
+author: "Halle Prine"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+*These exercises are about importing, tidying, and analyzing the Johnson Elementary ELA Project data. You will need to create a CSV file from the Excel file, but do not change either the Excel or CSV file prior to completing these exercises. For each item that involves changing the tibble, save the result so that you can use the new tibble in the next exercise. You may overwrite the previous tibble with the revised tibble by using the same tibble name.*
+
+***
+
+**1. Import the *Johnson Elementary ELA Project* data into a tibble. Use the *col_types* and *col_names* arguments to specify each variable type and to name the variables with the following names: Room, ID, Tard_Abs, Q1, Q2, Q3, and Q4.**
+
+```{r include=FALSE}
+# Load necessary libraries
+install.packages("tidyverse")
+library(here)
+library(tidyverse)
+library(readr)
+
+# Import the CSV data again to ensure it's correctly read
+ela_data <- read_csv(here("Data", "Johnson Elementary ELA Project.csv"))
+
+# View the column names to check for any hidden characters or issues
+names(ela_data)
+
+# Clean column names (remove any leading or trailing whitespace)
+names(ela_data) <- str_trim(names(ela_data))
+
+# Check the column names again
+names(ela_data)
+
+# Now, proceed with the rest of the operations
+ela_data <- ela_data %>%
+  set_names(c("Room", "ID", "Tard_Abs", "Q1", "Q2", "Q3", "Q4"))
+
+ela_data[-c(1:3), ]
+
+```
+
+
+***
+
+**2. Check for problems that occurred during the import and fix these problems. If there were no problems, report that there were no problems.**
+
+```{r include=FALSE}
+# Identify potential problems (missing values, column types)
+ela_data_problems <- problems(ela_data)
+
+# Display the rows in the imported data that contained identified problems
+ela_data_with_problems <- ela_data[ela_data_problems$row - 1, ]
+
+# View the rows with problems
+ela_data_with_problems
+```
+
+***
+
+**3. Fill in the *Room* variable so that the correct room is on each row.**
+
+```{r include=FALSE}
+install.packages("zoo")
+library(zoo)
+# Fill 'Room' column by carrying forward the room number until the next room number appears
+ela_data$Room <- na.locf(ela_data$Room, na.rm = FALSE)
+
+# View the cleaned data
+head(ela_data)
+
+ela_data[-c(1:4), ]
+
+```
+
+***
+
+**4. Filter out rows that do not contain any project data.**
+
+```{r include=FALSE}
+
+ela_data_clean <- ela_data %>%
+  filter(!is.na(Room) & !is.na(ID) & !is.na(Tard_Abs) & 
+         !is.na(Q1) & !is.na(Q2) & !is.na(Q3) & !is.na(Q4))
+
+ela_data_clean
+
+```
+
+
+***
+
+**5. For the *Room* variable, separate the word "Room" into a variable named *Temp* and the number of the room into a variable named *Room*.**
+
+```{r include=FALSE}
+# Separate the 'Room' variable into 'Temp' and 'Room' (keeping the word "Room" and the room number)
+ela_data_clean <- ela_data_clean %>%
+  separate(Room, into = c("Temp", "Room"), sep = " ")
+
+# View the cleaned data
+head(ela_data_clean)
+```
+
+
+***
+
+**6. Delete the *Temp* variable from the tibble.**
+
+```{r include=FALSE}
+ela_data_clean <- ela_data_clean %>%
+  select(-Temp)
+
+# View the cleaned data
+head(ela_data_clean)
+```
+
+
+***
+
+**7. Separate the *Tard_Abs* variable into a variable named *Tardies* that contains the tardy count and one named *Absences* that contains the absence count.**
+
+```{r include=FALSE}
+# Separate the 'Tard_Abs' variable into 'Tardies' and 'Absences'
+ela_data_clean <- ela_data_clean %>%
+  separate(Tard_Abs, into = c("Tardies", "Absences"), sep = ";", convert = TRUE)
+
+# View the cleaned data
+head(ela_data_clean)
+```
+
+
+***
+
+**8. Change the *Q1*, *Q2*, *Q3*, and *Q4* variables into two variables: one named *Quarter* that contains the quarter and one named *Rating* that contains the rating earned by the student in that quarter.**
+
+```{r include=FALSE}
+# Pivot the 'Q1', 'Q2', 'Q3', and 'Q4' columns into 'Quarter' and 'Rating'
+ela_data_clean_long <- ela_data_clean %>%
+  pivot_longer(cols = starts_with("Q"), 
+               names_to = "Quarter", 
+               values_to = "Rating", 
+               names_prefix = "Q", 
+               names_transform = list(Quarter = as.integer))
+
+# View the cleaned data
+head(ela_data_clean_long)
+```
+
+
+***
+
+**9. Create a code chunk in which you redo all the previous items. First, clear the environment. Then read in the data and fix problems (if necessary) as you did before. Finally, show how to tidy the data in one set of piped functions.**
+
+```{r include=FALSE}
+# Clear the environment
+rm(list = ls())
+
+# Load necessary libraries
+library(tidyverse)
+library(here)
+
+# Read in the data, remove the first three rows, and clean it up
+ela_data_clean <- read_csv(here("Data", "Johnson Elementary ELA Project.csv")) %>%
+  # Remove the first 3 rows
+  slice(-c(1:3)) %>%
+  # Clean column names
+  set_names(c("Room", "ID", "Tard_Abs", "Q1", "Q2", "Q3", "Q4")) %>%
+  # Separate 'Room' column into 'Temp' and 'Room' and remove 'Temp'
+  separate(Room, into = c("Temp", "Room"), sep = " ") %>%
+  select(-Temp) %>%
+  # Separate 'Tard_Abs' column into 'Tardies' and 'Absences'
+  separate(Tard_Abs, into = c("Tardies", "Absences"), sep = ";", convert = TRUE) %>%
+  # Pivot 'Q1', 'Q2', 'Q3', and 'Q4' columns into 'Quarter' and 'Rating'
+  pivot_longer(cols = starts_with("Q"), 
+               names_to = "Quarter", 
+               values_to = "Rating", 
+               names_prefix = "Q", 
+               names_transform = list(Quarter = as.integer)) %>%
+  # Fill 'Room' column with the last non-NA value
+  fill(Room) 
+
+# Filter out rows with missing data in key columns
+ela_data_clean <- ela_data_clean %>%
+  filter(!is.na(Room) & !is.na(ID) & !is.na(Tardies) & !is.na(Absences) & !is.na(Rating))
+
+# View the cleaned data
+head(ela_data_clean)
+```
+
+
+***
+
+**10. Provide summary statistics for the number of tardies for each room.**
+
+```{r include=FALSE}
+install.packages("dplyr")
+library(dplyr)
+
+# Calculate summary statistics for tardies by room
+tardies_summary <- ela_data_clean %>%
+  group_by(Room) %>%
+  summarize(
+    mean_tardies = mean(Tardies, na.rm = TRUE),
+    median_tardies = median(Tardies, na.rm = TRUE),
+    min_tardies = min(Tardies, na.rm = TRUE),
+    max_tardies = max(Tardies, na.rm = TRUE),
+    sd_tardies = sd(Tardies, na.rm = TRUE),
+    count = n()  # Count the number of rows (students) per room
+  )
+
+# View the summary statistics
+tardies_summary
+```
+
+
+***
+
+**11. Provide summary statistics for the number of absences for each room.**
+
+```{r include=FALSE}
+# Calculate summary statistics for absences by room
+absences_summary <- ela_data_clean %>%
+  group_by(Room) %>%
+  summarize(
+    mean_absences = mean(Absences, na.rm = TRUE),
+    median_absences = median(Absences, na.rm = TRUE),
+    min_absences = min(Absences, na.rm = TRUE),
+    max_absences = max(Absences, na.rm = TRUE),
+    sd_absences = sd(Absences, na.rm = TRUE),
+    count = n()  # Count the number of rows (students) per room
+  )
+
+# View the summary statistics
+absences_summary
+
+```
+
+
+***
+
+**12. Show the frequency of missing data points for each quarter by room.**
+
+```{r include=FALSE}
+# Calculate the frequency of missing data points for each quarter by room
+missing_data_by_quarter <- ela_data_clean %>%
+  group_by(Room, Quarter) %>%
+  summarize(
+    missing_data_count = sum(is.na(Rating)),  # Count the missing values in Rating
+    total_count = n()  # Total number of rows (students) in each room and quarter
+  ) %>%
+  mutate(
+    missing_percentage = (missing_data_count / total_count) * 100  # Calculate percentage of missing data
+  )
+
+# View the result
+missing_data_by_quarter
+
+```
+
+
+***
+
+**13. Construct a graph that facets by room and illustrates the median rating trends across the four quarters for each of the fifth-grade classes.**
+
+```{r include=FALSE}
+# Ensure Rating is numeric
+ela_data_clean <- ela_data_clean %>%
+  mutate(Rating = as.numeric(Rating))
+
+# Calculate the median rating for each room and quarter
+median_ratings <- ela_data_clean %>%
+  group_by(Room, Quarter) %>%
+  summarize(median_rating = median(Rating, na.rm = TRUE))
+
+# Create the graph
+ggplot(median_ratings, aes(x = Quarter, y = median_rating, group = Room)) +
+  geom_line() +  # Add line plot
+  geom_point() +  # Add points to indicate median values
+  facet_wrap(~ Room) +  # Create a facet for each room
+  labs(
+    title = "Median Rating Trends Across Quarters by Room",
+    x = "Quarter",
+    y = "Median Rating"
+  ) +
+  theme_minimal()  # Use a minimal theme for the plot
+```
+
+
+***
