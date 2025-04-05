@@ -21,23 +21,16 @@ library(here)
 library(tidyverse)
 library(readr)
 
-# Import the CSV data again to ensure it's correctly read
-ela_data <- read_csv(here("Data", "Johnson Elementary ELA Project.csv"))
-
-# View the column names to check for any hidden characters or issues
-names(ela_data)
-
-# Clean column names (remove any leading or trailing whitespace)
-names(ela_data) <- str_trim(names(ela_data))
-
-# Check the column names again
-names(ela_data)
-
-# Now, proceed with the rest of the operations
-ela_data <- ela_data %>%
-  set_names(c("Room", "ID", "Tard_Abs", "Q1", "Q2", "Q3", "Q4"))
-
-ela_data[-c(1:3), ]
+ela_data <- read_csv(here("Data", "Johnson Elementary ELA Project.csv"),
+                     skip = 4,
+                     col_types = "ciciiii",
+                     col_names = c("Room",
+                                   "ID",
+                                   "Tard_Abs",
+                                   "Q1",
+                                   "Q2",
+                                   "Q3",
+                                   "Q4"))
 
 ```
 
@@ -62,16 +55,9 @@ ela_data_with_problems
 **3. Fill in the *Room* variable so that the correct room is on each row.**
 
 ```{r include=FALSE}
-install.packages("zoo")
-library(zoo)
 # Fill 'Room' column by carrying forward the room number until the next room number appears
-ela_data$Room <- na.locf(ela_data$Room, na.rm = FALSE)
-
-# View the cleaned data
-head(ela_data)
-
-ela_data[-c(1:4), ]
-
+ela_data <- ela_data%>%
+  fill(Room)
 ```
 
 ***
@@ -79,13 +65,11 @@ ela_data[-c(1:4), ]
 **4. Filter out rows that do not contain any project data.**
 
 ```{r include=FALSE}
-
 ela_data_clean <- ela_data %>%
   filter(!is.na(Room) & !is.na(ID) & !is.na(Tard_Abs) & 
          !is.na(Q1) & !is.na(Q2) & !is.na(Q3) & !is.na(Q4))
 
 ela_data_clean
-
 ```
 
 
@@ -233,7 +217,6 @@ absences_summary <- ela_data_clean %>%
 
 # View the summary statistics
 absences_summary
-
 ```
 
 
@@ -255,7 +238,6 @@ missing_data_by_quarter <- ela_data_clean %>%
 
 # View the result
 missing_data_by_quarter
-
 ```
 
 

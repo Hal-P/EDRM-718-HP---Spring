@@ -83,9 +83,16 @@ tidy.survey <- survey %>%
            sep = ";",
            fill = "right")  # fill with NA when fewer than 4 colors
 
+tidy.survey <- survey %>%
+  separate(Responses, into = c("Response1", "Response2", "Response3", "Response4"), sep = ";") %>%
+  gather('Response1', 'Response2', 'Response3', 'Response4',
+         key = "Response",
+         value = "color")  %>%
+  mutate(Response = str_replace(Response, "Response", ""))
+
 print(tidy.survey, n = Inf)
 
-write_csv(tidy.survey, here("Data", "tidy_survey.csv"))
+write_csv(tidy.survey, here("Data", "tidy_survey_clean.csv"))
 
 ```
 
