@@ -1,0 +1,88 @@
+---
+title: "EDRM 718 Project H"
+author: "Halle Prine"
+format: html
+editor: visual
+---
+
+```{r include=FALSE}
+# Load necessary libraries
+install.packages("tidyverse")
+library(here)
+library(tidyverse)
+library(readr)
+library(knitr)
+library(kableExtra)
+
+airlines <- read_csv(here("Data", "Airlines Data.csv"))
+
+airports <- read_csv(here("Data", "Airports Data.csv"))
+
+nyc <- read_csv(here("Data", "NYC Flights 2013.csv"))
+
+```
+Agenda 1: On-time flights from New York To Atlanta 
+
+```{r include=FALSE}
+# Create plot data with counts and percents
+dest_plot_data <- tibble(
+  Airline = c("United Airlines", "United Airlines", "American Airlines"),
+  Type = c("Shared", "UA Only", "Shared"),
+  Count = c(length(shared), length(only_ua), length(shared))
+) %>%
+  group_by(Airline) %>%
+  mutate(
+    Percent = Count / sum(Count),
+    Label = scales::percent(Percent, accuracy = 1),
+    y_pos = cumsum(Count) - Count / 2  # Center label inside bar segment
+  )
+
+ggplot(dest_plot_data, aes(x = Airline, y = Count, fill = Type)) +
+  geom_col() +
+  geom_text(aes(label = Label, y = y_pos), color = "white", size = 4, fontface = "bold") +
+  scale_fill_manual(values = c("Shared" = "lightblue", "UA Only" = "steelblue")) +
+  labs(
+    title = "Destination Coverage from NYC (with Proportions)",
+    x = "Airline",
+    y = "Number of Destinations",
+    fill = "Destination Type"
+  ) +
+  theme_minimal()
+
+
+
+```
+
+Agenda 2: Destinations United Airlines flies to from NYC that American Airlines does not
+
+```{r include=FALSE}
+# Ccreate the summary data frame
+comparison_summary <- tibble(
+  Metric = c(
+    "Total Destinations (United Airlines)",
+    "Total Destinations (American Airlines)",
+    "Shared Destinations",
+    "Unique to United Airlines",
+    "Unique to American Airlines"
+  ),
+  Count = c(
+    length(ua_dests),
+    length(aa_dests),
+    length(shared),
+    length(only_ua),
+    length(only_aa)
+  )
+)
+
+# Style the table nicely with kableExtra
+comparison_summary %>%
+  kable(caption = "Comparison of Destination Coverage from NYC (UA vs. AA)", align = "l") %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    latex_options = c("striped", "hold_position", "scale_down"),
+    full_width = F,
+    position = "center"
+  ) %>%
+  row_spec(0, bold = TRUE, background = "#D9EAF7") %>%
+  column_spec(1, bold = TRUE)
+```
