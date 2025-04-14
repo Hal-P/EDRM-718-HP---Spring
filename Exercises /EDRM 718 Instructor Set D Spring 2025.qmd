@@ -1,0 +1,55 @@
+---
+title: "EDRM 718 Instructor Exercise Set D Spring 2025"
+format:
+  html:
+    embed-resources: true
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+```{r include=FALSE}
+# Load necessary libraries
+library(here)
+library(tidyverse)
+library(readr)
+library(gt)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+flights <- read_csv(here("Data", "NYC Flights 2013.csv"))
+
+airlines <- read_csv(here("Data", "Airlines Data.csv"))
+
+airports <- read_csv(here("Data", "Airports Data.csv"))
+```
+
+
+***
+
+**1. Use the NYC Flights Data to construct a graph that shows how many flights each carrier had to Atlanta in 2013. Only include carriers that had flights to Atlanta but include all such carriers. For airlines with 500 or fewer flights to Atlanta in the year, combine them into an *other* category on your graph.**
+
+```{r include=FALSE}
+#| message: true
+#| warning: true
+flights %>% 
+  select(carrier, dest) %>%
+  filter(dest = "ATL") %>%
+  left_join(airlines, by = "carrier") %>%
+  mutate(name = fact_lump)
+```
+
+
+***
+
+**2. Use the *Johnson Elementary Attendance Data* and the *Johnson Elementary Rating Data* to illustrate the average final rating (fourth quarter) for each room, in order of average rating.**
+
+***
+
+**3. Illustrate for the *Johnson Elementary Rating Data* how many students had missing ratings in the first semester (first two quarters) and the second semester (second two quarters).**
+
+***
+
+**4. Use the *Johnson Elementary Rating Data* to illustrate the trend of the median of all ratings.**
+
+***
