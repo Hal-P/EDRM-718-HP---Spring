@@ -7,82 +7,122 @@ editor: visual
 
 ```{r include=FALSE}
 # Load necessary libraries
-install.packages("tidyverse")
+# install.packages("tidyverse")
 library(here)
 library(tidyverse)
 library(readr)
 library(knitr)
 library(kableExtra)
+library(gt)
 
 airlines <- read_csv(here("Data", "Airlines Data.csv"))
 
 airports <- read_csv(here("Data", "Airports Data.csv"))
 
-nyc <- read_csv(here("Data", "NYC Flights 2013.csv"))
+flights <- read_csv(here("Data", "NYC Flights 2013.csv"))
 
 ```
-Agenda 1: On-time flights from New York To Atlanta 
 
-```{r include=FALSE}
-# Create plot data with counts and percents
-dest_plot_data <- tibble(
-  Airline = c("United Airlines", "United Airlines", "American Airlines"),
-  Type = c("Shared", "UA Only", "Shared"),
-  Count = c(length(shared), length(only_ua), length(shared))
-) %>%
-  group_by(Airline) %>%
-  mutate(
-    Percent = Count / sum(Count),
-    Label = scales::percent(Percent, accuracy = 1),
-    y_pos = cumsum(Count) - Count / 2  # Center label inside bar segment
-  )
+## Introduction
 
-ggplot(dest_plot_data, aes(x = Airline, y = Count, fill = Type)) +
+Flight delays remain the top concern among both domestic and international airline passengers. Even minor delays can disrupt travel plans—causing missed connections and increasing stress for both travelers and airline personnel, such as ticketing agents. Due to recurring reports of delayed United Airlines flights from New York City (NYC) to Atlanta (ATL), the United Airlines Board has commissioned a comprehensive data analysis report to prioritize efficiency and improve overall operations.
+
+This report aims to achieve two key objectives:
+
+1.  Assess whether recent management efforts have successfully addressed the delay issues on the NYC–ATL route.
+
+2.  Benchmark United Airlines against key competitors, such as American Airlines, by evaluating whether we are maintaining competitive destination offerings from NYC.
+
+## Agenda 1: On-time flights from New York To Atlanta
+
+To assess whether delays on United Airlines flights from NYC to Atlanta have been effectively addressed, we analyzed on-time arrival rates for all airlines operating this route. Figure 1 presents a comparison of the proportion of on-time arrivals by airline.
+
+United Airlines currently leads all competitors with the highest proportion of on-time arrivals, suggesting notable improvements in punctuality. In contrast, Southwest Airlines reported the lowest proportion, highlighting variability in performance across carriers. These findings indicate that management efforts on the NYC–ATL route may be yielding positive results for United Airlines.
+
+```{r echo=FALSE}
+# Filter flights to ATL
+atl_flights <- flights %>% 
+  filter(dest == "ATL")
+
+# Create on_time variable
+atl_flights <- atl_flights %>% 
+  mutate(on_time = arr_delay <= 0)
+
+# Calculate proportion on time by carrier
+on_time_summary <- atl_flights %>% 
+  group_by(carrier) %>% 
+  summarize(on_time_rate = mean(on_time, na.rm = TRUE)) %>% 
+  left_join(airlines, by = "carrier") %>% 
+  arrange(desc(on_time_rate))
+
+ggplot(on_time_summary, aes(x = reorder(name, on_time_rate), y = on_time_rate, fill = name)) +
   geom_col() +
-  geom_text(aes(label = Label, y = y_pos), color = "white", size = 4, fontface = "bold") +
-  scale_fill_manual(values = c("Shared" = "lightblue", "UA Only" = "steelblue")) +
+  coord_flip() +
   labs(
-    title = "Destination Coverage from NYC (with Proportions)",
+    title = "Figure 1. On-Time Arrival Rate from NYC to ATL by Airline",
     x = "Airline",
-    y = "Number of Destinations",
-    fill = "Destination Type"
+    y = "Proportion of On-Time Arrivals",
+    fill = "Airline"
   ) +
-  theme_minimal()
-
-
-
-```
-
-Agenda 2: Destinations United Airlines flies to from NYC that American Airlines does not
-
-```{r include=FALSE}
-# Ccreate the summary data frame
-comparison_summary <- tibble(
-  Metric = c(
-    "Total Destinations (United Airlines)",
-    "Total Destinations (American Airlines)",
-    "Shared Destinations",
-    "Unique to United Airlines",
-    "Unique to American Airlines"
-  ),
-  Count = c(
-    length(ua_dests),
-    length(aa_dests),
-    length(shared),
-    length(only_ua),
-    length(only_aa)
+  theme_classic(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    legend.position = "none"
   )
-)
 
-# Style the table nicely with kableExtra
-comparison_summary %>%
-  kable(caption = "Comparison of Destination Coverage from NYC (UA vs. AA)", align = "l") %>%
-  kable_styling(
-    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
-    latex_options = c("striped", "hold_position", "scale_down"),
-    full_width = F,
-    position = "center"
-  ) %>%
-  row_spec(0, bold = TRUE, background = "#D9EAF7") %>%
-  column_spec(1, bold = TRUE)
 ```
+
+## Agenda 2: Destinations United Airlines flies to from NYC that American Airlines does not
+
+```{r echo=FALSE}
+
+ua_flights <- flights %>%
+  filter(origin %in% c("JFK", "LGA", "EWR"), carrier == "UA") %>%
+  left_join(airports, by = c("dest" = "faa")) %>%
+  mutate(`FAA Code` = dest) %>%
+  select(carrier, name, `FAA Code`)
+
+
+aa_flights <- flights %>%
+  filter(origin %in% c("JFK", "LGA", "EWR"), carrier == "AA") %>%
+  left_join(airports, by = c("dest" = "faa")) %>%
+  mutate(`FAA Code` = dest) %>%
+  select(carrier, name, `FAA Code`)
+
+# Find exclusive destinations
+ua_only <- anti_join(ua_flights, aa_flights, by = "FAA Code") %>%
+  distinct(carrier, name, `FAA Code`)
+
+aa_only <- anti_join(aa_flights, ua_flights, by = "FAA Code") %>%
+  distinct(carrier, name, `FAA Code`)
+
+# Combine and clean
+exclusive_routes <- bind_rows(ua_only, aa_only) %>%
+  rename(
+    Airline = carrier,
+    `Destination Airport` = name
+  ) %>%
+  arrange(Airline, `Destination Airport`)
+
+exclusive_routes %>%
+  gt() %>%
+  tab_header(
+    title = md("**Figure 2. Exclusive Destinations from NYC by Airline**"),
+    subtitle = "Comparing United Airlines and American Airlines"
+  )
+
+```
+
+Table 1 displays the unique destinations served by United Airlines from NYC airports that are not offered by American Airlines. United provides service to 28 exclusive destinations, while American Airlines does not offer any destinations from NYC that United does not also serve. These findings suggest that United Airlines maintains a competitive advantage by offering a broader array of destination options to customers departing from the NYC area.
+
+## Conclusions
+
+The report analyzing United Airlines data yielded three main takeaways:
+
+-   United Airlines offers 28 unique destinations from NYC that are not served by American Airlines, highlighting a broader network of travel options for NYC-based customers.
+
+-   American Airlines does not offer any exclusive destinations from NYC, suggesting a more limited route offering in this market.
+
+-   These findings support the conclusion that United holds a competitive advantage in the NYC market through greater destination diversity, which may enhance customer choice and market presence.
+
+To build on these findings, future reports should include additional competitors such as Delta and JetBlue to better contextualize United Airlines’ market position in NYC. Expanding the scope to examine not only destination counts but also **route frequency, capacity, and seasonal availability** would provide a deeper understanding of service strength. Integrating **customer demand data and load factors** could help determine whether United’s unique routes are aligned with traveler preferences and profitability. Additionally, exploring targeted **marketing strategies** that emphasize United’s exclusive destinations may further strengthen its competitive edge and appeal to NYC-based travelers.

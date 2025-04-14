@@ -1,0 +1,162 @@
+---
+title: "EDRM 718 Exercise Set O"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+------------------------------------------------------------------------
+
+*These exercises are about working with strings as an important component of data science and statistical analysis. You will use the **Patient Data** and the **Williams Study Data** for these exercises. The patient data is a record of medical test readings at three time periods for six patients. The Williams study data includes totals of Likert scores on two surveys of high school students conducted across multiple schools in multiple districts. The surveys were sent by emails to the students selected to participate in the study.*
+
+------------------------------------------------------------------------
+
+**1. Read the *Patient Data* into a tibble named *patients*. Remove the word “Patient” from each patient so that the patient is represented by a letter.**
+
+```{r include=TRUE}
+library(here)
+library(tidyverse)
+library(readr)
+library(ggplot2)
+
+patients <- read_csv(here("Data", "Patient Data.csv"))
+
+patients <- patients %>%
+  mutate(patient = str_replace(patient, "Patient ", ""))
+```
+
+------------------------------------------------------------------------
+
+**2. Tidy the patients tibble. Call the new variable *trial* and call the values *reading*.**
+
+```{r include=TRUE}
+patients_tidy <- patients %>%
+  pivot_longer(
+    cols = -patient,        # All columns except 'patient'
+    names_to = "trial",     # New column for trial names
+    values_to = "reading"   # New column for values
+  )
+```
+
+------------------------------------------------------------------------
+
+**3. If you have not done so already, make the values of trial a single numeral without the word "reading".**
+
+```{r include=TRUE}
+patients_tidy <- patients_tidy %>%
+  mutate(trial = str_remove(trial, "reading\\."))
+```
+
+------------------------------------------------------------------------
+
+**4. Construct a line graph to illustrate the trends for all six patients.**
+
+```{r include=TRUE}
+ggplot(patients_tidy, aes(x = as.numeric(trial), y = reading, group = patient, color = patient)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    title = "Reading Trends Across Trials",
+    x = "Trial",
+    y = "Reading",
+    color = "Patient"
+  ) +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+**5. Construct the line graph again, but this time add a line to show the median trend.**
+
+```{r include=TRUE}
+# Calculate the median reading per trial
+median_trend <- patients_tidy %>%
+  group_by(trial) %>%
+  summarize(median_reading = median(reading, na.rm = TRUE))
+
+# Plot with individual lines + median trend line
+ggplot(patients_tidy, aes(x = as.numeric(trial), y = reading, group = patient, color = patient)) +
+  geom_line() +
+  geom_point() +
+  geom_line(data = median_trend, aes(x = as.numeric(trial), y = median_reading),
+            color = "black", linewidth = 1.2, linetype = "dashed", inherit.aes = FALSE) +
+  labs(
+    title = "Reading Trends Across Trials with Median Line",
+    x = "Trials",
+    y = "Reading Score",
+    color = "Patient"
+  ) +
+  theme_minimal()
+```
+
+------------------------------------------------------------------------
+
+**6. Read the *Williams Study Data* into a tibble named *williams*. Here is a regular expression that Mike wrote to catch most problems with email addresses. (Note: When viewed within the notebook, the single quote at the beginning and end is not part of the expression, but rather to treat the regex as a string.)**
+
+**`^[[:alnum:]._-]+@[[:alnum:].-]+\\.[[:alpha:]]{2,}$`**
+
+**Use this expression to find the five problem email addresses in the Williams Study Data.**
+
+```{r include=TRUE}
+# Step 1: Read in the data (assuming it's a CSV file)
+williams <- read_csv(here("Data", "Williams Study Data.csv"))
+
+# Step 2: Define the regex pattern for valid emails
+valid_email_regex <- "^[[:alnum:]._-]+@[[:alnum:].-]+\\.[[:alpha:]]{2,}$"
+
+# Filter for problematic emails
+problem_emails <- williams %>%
+  filter(!str_detect(`Email Address`, valid_email_regex))
+
+# View the bad emails
+problem_emails %>%
+  select(`Email Address`)
+```
+
+------------------------------------------------------------------------
+
+**7. For each of the problem email addresses above, explain what is wrong with the address and identify the portion of the *regex* that caught the problem.**
+
+Observing these email addresses we see that each one has a typo in the address:
+
+-   ***kalpol\@aol.c*** : is missing the '"com".
+
+-   ***kiddailey\@live.com**.* : has an extra dot after the "com"
+
+-   ***bcevcmsn.com*** : is missing the "\@" sign
+
+-   ***dpriceatt.net*** : also missing the "\@" sign and the ".com"
+
+-   ***sarah\@s\@aol.com*** : has two "\@" signs
+
+------------------------------------------------------------------------
+
+**8. Identify the line number in the file and the identification number of the participant for each incorrect address so that Ms. Williams will be able to locate the errors and correct them.**
+
+```{r include=TRUE}
+# Get problem emails with line number
+problem_emails <- williams %>%
+  mutate(row_number = row_number()) %>%  # Add line number
+  filter(!str_detect(`Email Address`, valid_email_regex)) %>%
+  select(row_number, `Identification Number`, `Email Address`)
+
+problem_emails
+```
+
+
+------------------------------------------------------------------------
+
+**9. The identification numbers are not only unique for each participant in the study, but they are coded so that the first digit represents a school district, and the next two digits represent a school in that district where the participant attends school. Ms. Williams needs the line number of all identification numbers that begin with “552”. Write a regular expression to find these lines and write the script needed to identify the line numbers. (Hint: Be sure that the identification number has a character class before you begin looking for these students.)**
+
+```{r include=TRUE}
+# Identify rows where Identification Number starts with "552"
+students_552 <- williams %>%
+  mutate(row_number = row_number()) %>%  # Add line number
+  filter(str_detect(as.character(`Identification Number`), "^552")) %>%
+  select(row_number, `Identification Number`)
+
+students_552
+```
+
+
+------------------------------------------------------------------------

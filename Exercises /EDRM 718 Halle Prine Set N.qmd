@@ -1,0 +1,184 @@
+---
+title: "EDRM 718 Exercise Set N"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+*These exercises are about working with factors. You will use the **Small Cities Health Data** and the **Small Cities Densities** file.*
+
+***
+
+**1. Import the *Small Cities Health Data* into a tibble named *health*. The *Small
+Cities Densities* file contains population density data for the same small cities. Add the density variable to the health tibble.**
+
+```{r include=FALSE}
+# Load necessary libraries
+# library(here)
+# library(tidyverse)
+# library(readr)
+# library(gt)
+# library(dplyr)
+# library(ggplot2)
+# library(tidyr)
+
+health <- read_csv(here("Data", "Small Cities Health Data.csv"))
+
+Density <- read_csv(here("Data", "Small Cities Densities.csv"))
+
+health <- health %>%
+  left_join(Density, by = "city.code")
+```
+
+
+***
+
+**2. Add a categorical density variable named *dens_cat* to the *health* tibble with levels “Low” (density up to 80), “Medium” (density from 80 to 120), and “High” (density above 120).**
+```{r include=FALSE}
+health <- health %>%
+  mutate(
+    dens_cat = case_when(
+      density <= 80 ~ "Low",
+      density > 80 & density <= 120 ~ "Medium",
+      density > 120 ~ "High"
+    )
+  )
+```
+
+***
+
+**3. Construct a bar graph to illustrate how many cities there are at each density level.**
+```{r include=FALSE}
+ggplot(health, aes(x = dens_cat)) +
+  geom_bar() +
+  labs(
+    title = "Number of Cities by Density Category",
+    x = "Density Category",
+    y = "Number of Cities"
+  ) +
+  theme_minimal()
+```
+
+
+***
+
+**4. Construct the same bar graph you constructed in the previous exercise but reverse the order of the bars in the bar graph.**
+
+```{r include=FALSE}
+ggplot(health, aes(x = fct_rev(dens_cat))) +
+  geom_bar() +
+  labs(
+    title = "Number of Cities by Density Category (Reversed Order)",
+    x = "Density Category",
+    y = "Number of Cities"
+  ) +
+  theme_minimal()
+```
+
+
+***
+
+**5. Count the number of towns in each of the density categories and display this in a table.**
+```{r include=FALSE}
+health %>%
+  count(dens_cat) %>%
+  gt() %>%
+  tab_header(
+    title = "Number of Towns by Density Category"
+  ) %>%
+  cols_label(
+    dens_cat = "Density Category",
+    n = "Number of Towns"
+  )
+```
+
+
+***
+
+**6. Add a factor named *bed_cat* for the number of hospital beds per 100,000 residents so that each category represents a 100-bed interval (300 - 399, 400 - 499, etc.).**
+```{r include=FALSE}
+health <- health %>%
+  mutate(bed_cat = as.factor(trunc(hosp.beds/100)))
+```
+
+
+***
+
+**7. Collapse *bed_cat* into four levels: "Low" (0 to 499 beds), "Medium", (500 to 999 beds), "High" (1000 to 1499 beds), and "Very_High" (1500 and above beds).**
+```{r include=FALSE}
+health <- health %>%
+  mutate(
+    bed_cat4 = case_when(
+      hosp.beds < 500 ~ "Low",
+      hosp.beds >= 500 & hosp.beds < 1000 ~ "Medium",
+      hosp.beds >= 1000 & hosp.beds < 1500 ~ "High",
+      hosp.beds >= 1500 ~ "Very_High"
+    )
+  )
+
+health <- health %>%
+  mutate(
+    bed_cat4 = factor(bed_cat4, levels = c("Low", "Medium", "High", "Very_High"), ordered = TRUE)
+  )
+```
+
+***
+
+**8. For the final exercises we will exclude towns with a *very high* number of hospital beds, so change your *health* tibble to exclude these towns. Make sure that you do not leave any unused levels in the tibble.**
+```{r include=FALSE}
+health <- health %>%
+  filter(bed_cat4 != "Very_High") %>%
+  mutate(
+    bed_cat4 = droplevels(factor(bed_cat4))
+  )
+```
+
+
+***
+
+**9. Create a figure using the two categorical variables to illustrate whether population density appears to influence hospital bed density.**
+```{r include=FALSE}
+ggplot(health, aes(x = dens_cat, fill = bed_cat4)) +
+  geom_bar(position = "fill") +
+  labs(
+    title = "Hospital Bed Density by Population Density",
+    x = "Population Density Category",
+    y = "Proportion of Towns",
+    fill = "Hospital Bed Density"
+  ) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  theme_minimal()
+```
+
+***
+
+**10. Provide summary statistics that correspond to the figure you created above.**
+```{r include=FALSE}
+summary_table <- health %>%
+  count(dens_cat, bed_cat4) %>%
+  group_by(dens_cat) %>%
+  mutate(
+    proportion = n / sum(n)
+  ) %>%
+  ungroup()
+
+summary_table %>%
+  mutate(
+    proportion = scales::percent(proportion, accuracy = 0.1)
+  ) %>%
+  gt() %>%
+  tab_header(
+    title = "Proportion of Towns by Population and Hospital Bed Density"
+  ) %>%
+  cols_label(
+    dens_cat = "Population Density",
+    bed_cat4 = "Hospital Bed Density",
+    n = "Number of Towns",
+    proportion = "Proportion"
+  )
+```
+
+
+***
