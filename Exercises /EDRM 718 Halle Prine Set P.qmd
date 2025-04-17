@@ -1,0 +1,116 @@
+---
+title: "EDRM 718 Exercise Set P"
+format: html
+---
+
+*Put your name as the author of this notebook in the YAML, then complete each of the items below. Make sure that your notebook is neat and organized and that all your code chunks run without error, even after clearing the environment. (Six points per item)*
+
+***
+
+*These exercises are about using vectorization instead of loops. Do not use any type of loop (e.g., for, while, repeat) to complete an exercise. You will use the **NormalSamples** data. Each column in this data set is a randomly selected sample of 60 observations from a normally distributed population of scores. There are 1,000 samples in the data set.*
+```{r include=TRUE}
+library(here)
+library(tidyverse)
+library(readr)
+
+norm_sample <- read_csv(here("Data", "NormalSamples.csv"))
+
+```
+
+
+***
+
+**1. Calculate the mean and standard deviation of each sample. Put the means into a *mean_vec* vector and the standard deviations into a *sd_vec* vector.**
+```{r include=TRUE}
+# Calculate the mean of each sample (column)
+mean_vec <- colMeans(norm_sample)
+
+# Calculate the standard deviation of each sample (column)
+sd_vec <- apply(norm_sample, 2, sd)
+
+sd_vec
+```
+
+
+***
+
+**2. The samples were drawn from a population with a mean of 30 and a standard deviation of 8. If you use *mean_vec* and *sd_vec* to make a guess as to whether either of these statistics are unbiased, what would you guess and why?**
+```{r include=TRUE}
+mean_of_means <- mean(mean_vec)
+mean_of_means
+
+mean_of_sds <- mean(sd_vec)
+mean_of_sds
+```
+Based on mean_vec and sd_vec, I would guess that both the sample mean and the sample standard deviation are unbiased estimators of the population parameters. This is because the average of the sample means is very close to 30, and the average of the sample standard deviations is very close to 8, which matches the population parameters from which the samples were drawn. 
+
+***
+
+**3. If we test the null hypothesis that the population mean is 30 (which it is!), any rejection of this hypothesis is a Type I error. If you conduct a test of this hypothesis using a 0.05 Type I error rate with 1,000 samples, how many Type I errors do you expect you will obtain? Conduct this test with the 1,000 samples and determine how many of these result in a Type I error.**
+```{r include=TRUE}
+expected_type1_errors <- 0.05 * 1000  # = 50
+
+# Sample size per column
+n <- nrow(norm_sample)
+
+# Standard errors for each sample
+se_vec <- sd_vec / sqrt(n)
+
+# t statistics for each sample
+t_stats <- (mean_vec - 30) / se_vec
+
+# Two-tailed p-values
+p_vals <- 2 * pt(-abs(t_stats), df = n - 1)
+
+# Count Type I errors (p < 0.05)
+type1_errors <- sum(p_vals < 0.05)
+type1_errors
+```
+
+
+***
+
+**4. If you conduct a test of the null hypothesis that the mean is 30 using a 0.10 Type I error rate with 1,000 samples, how many Type I errors do you expect you will obtain? Conduct this test with the 1,000 samples and determine how many of these result in a Type I error.**
+```{r include=TRUE}
+# Updated alpha level
+alpha <- 0.10
+
+# Reuse t_stats and p_vals from earlier — or recalculate if needed:
+t_stats <- (mean_vec - 30) / (sd_vec / sqrt(n))
+p_vals <- 2 * pt(-abs(t_stats), df = n - 1)
+
+# Count Type I errors at new alpha level
+type1_errors_10 <- sum(p_vals < alpha)
+
+# Print number of errors
+type1_errors_10
+```
+
+
+***
+
+**5. Obtain the means of the 1,000 samples four different ways. (a) Use Base R to put the means in a list. (b) Use the tidyverse to put the means in a list. (c) Use Base R to put the means in a vector. (d) Use the tidyverse to put the means in a vector. Which of these methods used vectorized functions? How do you know?**
+```{r include=TRUE}
+# a.) Base R - Put the means in a list
+mean_list_base <- lapply(norm_sample, mean)
+mean_list_base
+
+# b.) Tidyverse - Put the means in a list
+mean_list_tidy <- norm_sample %>%
+  summarise(across(everything(), ~ mean(.))) %>%
+  as.list()
+mean_list_tidy
+
+# c.) Base R - Put the means in a vector
+mean_vec_base <- sapply(norm_sample, mean)
+mean_vec_base
+
+# d.) Tidyverse - Put the means in a vector
+mean_vec_tidy <- norm_sample %>%
+  summarise(across(everything(), mean)) %>%
+  unlist(use.names = FALSE)
+mean_vec_tidy
+```
+
+
+***
